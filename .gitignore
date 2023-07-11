@@ -1,0 +1,9 @@
+.idea/*
+node_modules/*
+package-lock.json
+log/*
+.DS_Store
+database.js
+secret.js
+config/database.js
+config/secret.js
