@@ -15,4 +15,7 @@ module.exports = function (app) {
 
   // 닉네임 중복 확인
   app.get("/app/users/checkname/:nickname", user.repeatName);
+
+  // id 찾기
+  app.post("/app/users/find/id",user.findId);
 };

@@ -126,6 +126,12 @@ module.exports = {
     SIGNUP_INFO_EMPTY : { "isSuccess": false, "code": 400, "message": "모든 항목을 입력해주세요." }, // 회원가입 할 때, 빈 항목이 있을 때
     SIGNUP_PASSWORD_ERROR : { "isSuccess": false, "code": 400, "message": "비밀번호 설정 조건을 확인해주세요." }, // 회원가입 할 때, 비밀번호 형식 오류
     SIGNIN_USER_ID_ERROR : { "isSuccess": false, "code": 400, "message": "일치하는 id가 없습니다." },
+    USER_USERID_AND_PHONENUM_NOT_EXIST: {
+      isSuccess: false,
+      code: 404,
+      message: "입력하신 사용자 정보와 일치하는 회원이 없습니다.",
+    },
+    USER_INFO_EMPTY : {"isSuccess": false, "code": 400, "message": "사용자 정보를 모두 입력해주세요." },
 
     // Response error
     SIGNUP_REDUNDANT_EMAIL : { "isSuccess": false, "code": 400, "message":"중복된 이메일입니다." },

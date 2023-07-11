@@ -13,12 +13,14 @@ const {connect} = require("http2");
 
 // Service: Create, Update, Delete 비즈니스 로직 처리
 
-exports.createUser = async function (marketing_agreement,user_id,password,phone_num,birth,nickname) {
+exports.createUser = async function (marketing_agreement,user_id,password,phone_num,birth,nickname,username) {
     try {
-      // id 중복 확인 -> 나중에 구현
-      //const user_id_rows = await userProvider.user_id_check(user_id);
-      //if (user_id_rows.length > 0)
-      //  return errResponse(baseResponse.SIGNUP_REDUNDANT_USER_ID);
+      //id 중복 확인
+      const id_result = await userProvider.retrieveRepeatId(user_id);
+
+      if (id_result.length > 0) {
+        return baseResponse.SIGNUP_REDUNDANT_ID;
+      }
 
       // 비밀번호 암호화
       const hashedPassword = await crypto
@@ -26,7 +28,7 @@ exports.createUser = async function (marketing_agreement,user_id,password,phone_
         .update(password)
         .digest("hex");
   
-      const insertUserInfoParams = [marketing_agreement,user_id,hashedPassword,phone_num,birth,nickname];
+      const insertUserInfoParams = [marketing_agreement,user_id,hashedPassword,phone_num,birth,nickname,username];
 
       const connection = await pool.getConnection(async (conn) => conn);
   
@@ -49,11 +51,8 @@ exports.createUser = async function (marketing_agreement,user_id,password,phone_
 // 로그인 인증 방법 (JWT)
 exports.postSignIn = async function (user_id, password) {
     try {
-
-        
         const user_id_rows = await userProvider.user_id_check(user_id);
         if (user_id_rows.length < 1)
-            //return errResponse(baseResponse.SIGNIN_EMAIL_WRONG);
             return errResponse(baseResponse.SIGNIN_USER_ID_ERROR)
   
         const selectUserId = user_id_rows[0].user_id;
@@ -68,8 +67,8 @@ exports.postSignIn = async function (user_id, password) {
       const passwordRows = await userProvider.passwordCheck(
         selectUserPasswordParams
       );
-  
-      if (passwordRows[0].password !== hashedPassword) {
+      
+      if(!passwordRows[0] || (passwordRows[0].password !== hashedPassword)){ // 수정
         return errResponse(baseResponse.SIGNIN_PASSWORD_WRONG);
       }
 
@@ -92,6 +91,7 @@ exports.postSignIn = async function (user_id, password) {
         userId: user_id_rows[0].user_id,
         jwt: token,
       });
+      
     } catch (err) {
       logger.error(
         `App - postSignIn Service error\n: ${err.message} \n${JSON.stringify(

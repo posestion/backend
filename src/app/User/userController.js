@@ -30,22 +30,21 @@ function validatePassword(password) {
 //회원가입
 exports.postUsers = async function (req, res) {
 
-  const {marketing_agreement,user_id,password,phone_num,birth,nickname} = req.body;
+  const {marketing_agreement,user_id,password,phone_num,birth,nickname,username} = await req.body;
 
   //1. 모두 null이 아닌지
-  if(!marketing_agreement && !user_id && !password && !phone_num && !birth && !nickname)
+  if( !marketing_agreement || !user_id || !password || !phone_num || !birth || !nickname || !username)
   {
     return res.send(baseResponse.USER_INFO_EMPTY);
   }
-  // 중복된 user id 가 있는지.
 
   //3.password
   if(!validatePassword(password)){
-      res.send(SIGNUP_PASSWORD_ERROR);
+      return res.send(SIGNUP_PASSWORD_ERROR);
   }
 
   const signUpResponse = await userService.createUser(
-      marketing_agreement,user_id,password,phone_num,birth,nickname
+      marketing_agreement,user_id,password,phone_num,birth,nickname,username
   );
 
   return res.send(signUpResponse);
@@ -87,3 +86,17 @@ exports.repeatName = async function (req, res) {
     );
   }
 };
+
+//아이디 찾기
+exports.findId = async function (req, res) {
+  const {username,phone_num} = req.body;
+
+  const result = await userProvider.findId(username,phone_num);
+
+  if ( !result ){
+    return res.send(baseResponse.USER_USERID_AND_PHONENUM_NOT_EXIST);
+  }
+  else{
+    return res.send(response(baseResponse.SUCCESS,result));
+  }
+}

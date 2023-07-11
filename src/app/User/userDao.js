@@ -2,8 +2,8 @@
 // 유저 생성
 async function insertUserInfo(connection, insertUserInfoParams) {
   const insertUserInfoQuery = `
-        INSERT INTO User(marketing_agreement,user_id,password,phone_num,birth,nickname)
-        VALUES (?, ?, ?, ?, ?, ?);
+        INSERT INTO User(marketing_agreement,user_id,password,phone_num,birth,nickname,username)
+        VALUES (?, ?, ?, ?, ?, ?,?);
     `;
 
   const insertUserInfoRow = await connection.query(
@@ -62,10 +62,24 @@ async function selectRepeatName(connection, name) {
   return repeatName;
 }
 
+// 아이디 찾기 _ 전화번호와 아이디로
+async function selectUserId_UsernameAndPhone(connection,nameAndPhone){
+  const query = `
+  SELECT user_id
+  FROM User
+  where username=? and phone_num=?
+  `
+  const [userid] = await connection.query(query,nameAndPhone);
+  console.log("dao : ");
+  console.log(userid);
+  return userid;
+}
+
 module.exports = {
   selectRepeatId,
   selectRepeatName,
   insertUserInfo,
   selectUserId,
-  selectUserPassword
+  selectUserPassword,
+  selectUserId_UsernameAndPhone
 };

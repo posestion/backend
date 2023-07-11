@@ -20,6 +20,8 @@ exports.passwordCheck = async function (selectUserPasswordParams) {
       selectUserPasswordParams
   );
   connection.release();
+  await console.log("db");
+  await console.log(passwordCheckResult[0]);
   return passwordCheckResult[0];
 };
 // 중복 id 확인
@@ -41,3 +43,14 @@ exports.retrieveRepeatName = async function (name) {
 
   return userNameResult;
 };
+
+// id 찾기
+exports.findId =  async function (username,phone_num){
+  const connection = await pool.getConnection(async (conn) => conn);
+  const UsernameAndPhone = [username,phone_num];
+  
+  const userId= await userDao.selectUserId_UsernameAndPhone(connection,UsernameAndPhone)
+  connection.release();
+  
+  return userId[0];
+}
