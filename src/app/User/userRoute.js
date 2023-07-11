@@ -2,6 +2,10 @@ module.exports = function (app) {
   const user = require("./userController");
   const jwtMiddleware = require("../../../config/jwtMiddleware");
 
+  // 승아 - 수정합니다. git 테스트
+  // git test중입니다.
+  // git test중입니다.
+
 
   // 중복 id 검사
   //app.get("/app/users:id", user.repeatId);
