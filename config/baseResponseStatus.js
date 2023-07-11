@@ -31,6 +31,11 @@ module.exports = {
 
     USER_STATUS_EMPTY : { "isSuccess": false, "code": 400, "message": "회원 상태값을 입력해주세요" },
 
+    // 노승아
+    SIGNUP_INFO_EMPTY : { "isSuccess": false, "code": 400, "message": "모든 항목을 입력해주세요." }, // 회원가입 할 때, 빈 항목이 있을 때
+    SIGNUP_PASSWORD_ERROR : { "isSuccess": false, "code": 400, "message": "비밀번호 설정 조건을 확인해주세요." }, // 회원가입 할 때, 비밀번호 형식 오류
+    SIGNIN_USER_ID_ERROR : { "isSuccess": false, "code": 400, "message": "일치하는 id가 없습니다." },
+
     // Response error
     SIGNUP_REDUNDANT_EMAIL : { "isSuccess": false, "code": 400, "message":"중복된 이메일입니다." },
     SIGNUP_REDUNDANT_NICKNAME : { "isSuccess": false, "code": 400, "message":"중복된 닉네임입니다." },
