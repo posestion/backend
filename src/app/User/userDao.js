@@ -1,4 +1,3 @@
-
 // 유저 생성
 async function insertUserInfo(connection, insertUserInfoParams) {
   const insertUserInfoQuery = `
@@ -13,7 +12,6 @@ async function insertUserInfo(connection, insertUserInfoParams) {
   console.log(insertUserInfoRow);
   return insertUserInfoRow;
 }
-
 
 async function selectUserId(connection, user_id) {
   const selectUserIdQuery = `
@@ -32,13 +30,12 @@ async function selectUserPassword(connection, selectUserPasswordParams) {
         FROM User 
         WHERE user_id = ? AND password = ?;`;
   const selectUserPasswordRow = await connection.query(
-      selectUserPasswordQuery,
-      selectUserPasswordParams
+    selectUserPasswordQuery,
+    selectUserPasswordParams
   );
 
   return selectUserPasswordRow;
 }
-
 
 // 중복 id 확인
 async function selectRepeatId(connection, id) {
@@ -63,16 +60,39 @@ async function selectRepeatName(connection, name) {
 }
 
 // 아이디 찾기 _ 전화번호와 아이디로
-async function selectUserId_UsernameAndPhone(connection,nameAndPhone){
+async function selectUserId_UsernameAndPhone(connection, nameAndPhone) {
   const query = `
   SELECT user_id
   FROM User
   where username=? and phone_num=?
-  `
-  const [userid] = await connection.query(query,nameAndPhone);
+  `;
+  const [userid] = await connection.query(query, nameAndPhone);
   console.log("dao : ");
   console.log(userid);
   return userid;
+}
+
+// 비밀번호 재설정 - id, 이름, 전화번호 확인
+async function selectIdNameNum(connection, id_name_num) {
+  const query = `
+    SELECT user_id,username,phone_num
+    FROM User
+    WHERE user_id=? AND username=? AND phone_num=?;
+    `;
+
+  const [userid] = await connection.query(query, id_name_num);
+  return userid;
+}
+// 비밀번호 재설정 - password 변경
+async function passwordReset(connection, newPw) {
+  const query = `
+    UPDATE User
+    SET password=?
+    WHERE user_id=?;
+    `;
+
+  const [newpw] = await connection.query(query, newPw);
+  return newpw;
 }
 
 module.exports = {
@@ -81,5 +101,7 @@ module.exports = {
   insertUserInfo,
   selectUserId,
   selectUserPassword,
-  selectUserId_UsernameAndPhone
+  selectUserId_UsernameAndPhone,
+  selectIdNameNum,
+  passwordReset,
 };

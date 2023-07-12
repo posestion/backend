@@ -16,8 +16,8 @@ exports.user_id_check = async function (user_id) {
 exports.passwordCheck = async function (selectUserPasswordParams) {
   const connection = await pool.getConnection(async (conn) => conn);
   const passwordCheckResult = await userDao.selectUserPassword(
-      connection,
-      selectUserPasswordParams
+    connection,
+    selectUserPasswordParams
   );
   connection.release();
   await console.log("db");
@@ -45,12 +45,26 @@ exports.retrieveRepeatName = async function (name) {
 };
 
 // id 찾기
-exports.findId =  async function (username,phone_num){
+exports.findId = async function (username, phone_num) {
   const connection = await pool.getConnection(async (conn) => conn);
-  const UsernameAndPhone = [username,phone_num];
-  
-  const userId= await userDao.selectUserId_UsernameAndPhone(connection,UsernameAndPhone)
+  const UsernameAndPhone = [username, phone_num];
+
+  const userId = await userDao.selectUserId_UsernameAndPhone(
+    connection,
+    UsernameAndPhone
+  );
   connection.release();
-  
+
   return userId[0];
-}
+};
+
+// 비밀번호 재설정 - id, 이름, 전화번호 확인
+exports.check_id_name_num = async function (user_id, username, phone_num) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  const id_name_num = [user_id, username, phone_num];
+
+  const idNameNum = await userDao.selectIdNameNum(connection, id_name_num);
+  connection.release();
+
+  return idNameNum;
+};

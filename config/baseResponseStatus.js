@@ -122,22 +122,46 @@ module.exports = {
     message: "중복된 닉네임입니다.",
   },
 
-    // 노승아
-    SIGNUP_INFO_EMPTY : { "isSuccess": false, "code": 400, "message": "모든 항목을 입력해주세요." }, // 회원가입 할 때, 빈 항목이 있을 때
-    SIGNUP_PASSWORD_ERROR : { "isSuccess": false, "code": 400, "message": "비밀번호 설정 조건을 확인해주세요." }, // 회원가입 할 때, 비밀번호 형식 오류
-    SIGNIN_USER_ID_ERROR : { "isSuccess": false, "code": 400, "message": "일치하는 id가 없습니다." },
-    USER_USERID_AND_PHONENUM_NOT_EXIST: {
-      isSuccess: false,
-      code: 404,
-      message: "입력하신 사용자 정보와 일치하는 회원이 없습니다.",
-    },
-    USER_INFO_EMPTY : {"isSuccess": false, "code": 400, "message": "사용자 정보를 모두 입력해주세요." },
+  // 노승아
+  SIGNUP_INFO_EMPTY: {
+    isSuccess: false,
+    code: 400,
+    message: "모든 항목을 입력해주세요.",
+  }, // 회원가입 할 때, 빈 항목이 있을 때
+  SIGNUP_PASSWORD_ERROR: {
+    isSuccess: false,
+    code: 400,
+    message: "비밀번호 설정 조건을 확인해주세요.",
+  }, // 회원가입 할 때, 비밀번호 형식 오류
+  SIGNIN_USER_ID_ERROR: {
+    isSuccess: false,
+    code: 400,
+    message: "일치하는 id가 없습니다.",
+  },
+  USER_USERID_AND_PHONENUM_NOT_EXIST: {
+    isSuccess: false,
+    code: 404,
+    message: "입력하신 사용자 정보와 일치하는 회원이 없습니다.",
+  },
+  USER_INFO_EMPTY: {
+    isSuccess: false,
+    code: 400,
+    message: "사용자 정보를 모두 입력해주세요.",
+  },
 
-    // Response error
-    SIGNUP_REDUNDANT_EMAIL : { "isSuccess": false, "code": 400, "message":"중복된 이메일입니다." },
-    SIGNUP_REDUNDANT_NICKNAME : { "isSuccess": false, "code": 400, "message":"중복된 닉네임입니다." },
+  // Response error
+  SIGNUP_REDUNDANT_EMAIL: {
+    isSuccess: false,
+    code: 400,
+    message: "중복된 이메일입니다.",
+  },
+  SIGNUP_REDUNDANT_NICKNAME: {
+    isSuccess: false,
+    code: 400,
+    message: "중복된 닉네임입니다.",
+  },
 
-    SIGNIN_EMAIL_WRONG: {
+  SIGNIN_EMAIL_WRONG: {
     isSuccess: false,
     code: 404,
     message: "아이디가 잘못 되었습니다.",
@@ -157,7 +181,11 @@ module.exports = {
     code: 400,
     message: "탈퇴 된 계정입니다. 고객센터에 문의해주세요.",
   },
-
+  PW_CONDITION_MISMATCH: {
+    isSuccess: false,
+    code: 400,
+    message: "비밀번호 조건 불일치",
+  },
   //Connection, Transaction 등의 서버 오류
   DB_ERROR: { isSuccess: false, code: 500, message: "데이터 베이스 에러" },
   SERVER_ERROR: { isSuccess: false, code: 500, message: "서버 에러" },

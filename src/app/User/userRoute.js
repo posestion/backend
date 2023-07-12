@@ -17,5 +17,8 @@ module.exports = function (app) {
   app.get("/app/users/checkname/:nickname", user.repeatName);
 
   // id 찾기
-  app.post("/app/users/find/id",user.findId);
+  app.post("/app/users/find/id", user.findId);
+
+  // 비밀번호 재설정
+  app.patch("/app/users/pwReset", user.resetPw);
 };
