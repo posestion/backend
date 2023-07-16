@@ -94,6 +94,13 @@ async function passwordReset(connection, newPw) {
   return newpw;
 }
 
+//모든 유저 반환
+async function alluser(connection) {
+  const [users] = await connection.query('SELECT * FROM User');
+  return users;
+}
+
+
 module.exports = {
   selectRepeatId,
   selectRepeatName,
@@ -103,4 +110,5 @@ module.exports = {
   selectUserId_UsernameAndPhone,
   selectIdNameNum,
   passwordReset,
+  alluser
 };

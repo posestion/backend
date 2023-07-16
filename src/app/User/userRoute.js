@@ -30,5 +30,7 @@ module.exports = function (app) {
   //로그인 유지 방식(예시)
   app.get("/app/hi",jwtMiddleware,(req,res)=>{res.send(req.verifiedToken.userId)});
 
+  //모든 사용자 정보 가져오기
+  app.get("/app/getAllUsers",user.alluser);
 
 };

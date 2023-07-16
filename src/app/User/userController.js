@@ -153,3 +153,9 @@ exports.resetPw = async function (req, res) {
     // return res.send(response(baseResponse.SUCCESS, reset_pw));
   }
 };
+
+//alluser
+exports.alluser = async function (req, res){
+  const alluser = await userProvider.alluser();
+  res.send(alluser);
+}

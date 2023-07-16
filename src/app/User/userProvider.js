@@ -68,3 +68,14 @@ exports.check_id_name_num = async function (user_id, username, phone_num) {
 
   return idNameNum;
 };
+
+//모든 사용자 반환
+exports.alluser = async function (){
+  const connection = await pool.getConnection(async (conn) => conn);
+
+  const alluser = await userDao.alluser(connection);
+
+  connection.release();
+
+  return alluser;
+}
