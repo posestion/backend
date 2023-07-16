@@ -7,3 +7,4 @@ database.js
 secret.js
 config/database.js
 config/secret.js
+s3.js

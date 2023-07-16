@@ -6,7 +6,7 @@ const userDao = require("./userDao");
 const baseResponse = require("../../../config/baseResponseStatus");
 const { response } = require("../../../config/response");
 const { errResponse } = require("../../../config/response");
-
+const { imageUploader, allowedExtensions } = require("../../../config/imageUploader");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const { connect } = require("http2");
@@ -20,7 +20,8 @@ exports.createUser = async function (
   phone_num,
   birth,
   nickname,
-  username
+  username,
+  imageURL
 ) {
   try {
     //id 중복 확인
@@ -29,6 +30,8 @@ exports.createUser = async function (
     if (id_result.length > 0) {
       return baseResponse.SIGNUP_REDUNDANT_ID;
     }
+
+
 
     // 비밀번호 암호화
     const hashedPassword = await crypto
@@ -44,6 +47,7 @@ exports.createUser = async function (
       birth,
       nickname,
       username,
+      imageURL
     ];
 
     const connection = await pool.getConnection(async (conn) => conn);

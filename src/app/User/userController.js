@@ -3,10 +3,10 @@ const userProvider = require("../../app/User/userProvider");
 const userService = require("../../app/User/userService");
 const baseResponse = require("../../../config/baseResponseStatus");
 const { response, errResponse } = require("../../../config/response");
-
+const { imageUploader } = require("../../../config/imageUploader");
 const regexEmail = require("regex-email");
 const { emit } = require("nodemon");
-
+const multer = require("multer");
 function validatePassword(password) {
   // 대문자, 소문자, 숫자, 특수 문자 포함 여부 확인
   var upperCaseRegex = /[A-Z]/;
@@ -37,9 +37,18 @@ exports.postUsers = async function (req, res) {
     phone_num,
     birth,
     nickname,
-    username,
+    username, 
   } = await req.body;
 
+  var imageURL;
+  if(req.file){
+    imageURL = req.file.location;
+  }else{
+    imageURL = null;
+  }
+
+  
+  console.log(imageURL);
   //1. 모두 null이 아닌지
   if (
     !marketing_agreement ||
@@ -53,6 +62,7 @@ exports.postUsers = async function (req, res) {
     return res.send(baseResponse.USER_INFO_EMPTY);
   }
 
+
   //3.password
   if (!validatePassword(password)) {
     return res.send(SIGNUP_PASSWORD_ERROR);
@@ -65,7 +75,8 @@ exports.postUsers = async function (req, res) {
     phone_num,
     birth,
     nickname,
-    username
+    username,
+    imageURL //
   );
 
   return res.send(signUpResponse);
@@ -80,7 +91,7 @@ exports.login = async function (req, res) {
   return res.send(signInResponse);
 };
 
-// id 중복 확인
+// id 중복  확인
 exports.repeatId = async function (req, res) {
   const user_id = req.params.id;
   const id_result = await userProvider.retrieveRepeatId(user_id);

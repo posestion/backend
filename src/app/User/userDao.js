@@ -1,15 +1,14 @@
 // 유저 생성
 async function insertUserInfo(connection, insertUserInfoParams) {
   const insertUserInfoQuery = `
-        INSERT INTO User(marketing_agreement,user_id,password,phone_num,birth,nickname,username)
-        VALUES (?, ?, ?, ?, ?, ?,?);
+        INSERT INTO User(marketing_agreement,user_id,password,phone_num,birth,nickname,username,profile_image)
+        VALUES (?, ?, ?, ?, ?, ?,?,?);
     `;
 
   const insertUserInfoRow = await connection.query(
     insertUserInfoQuery,
     insertUserInfoParams
   );
-  console.log(insertUserInfoRow);
   return insertUserInfoRow;
 }
 
