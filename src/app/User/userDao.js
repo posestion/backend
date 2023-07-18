@@ -100,6 +100,12 @@ async function alluser(connection) {
   return users;
 }
 
+//아이디로 고유번호 가져오기 -> 게시물에서 사용
+async function selectUserIdx_by_user_id(connection,user_id){
+  const [users] = await connection.query('SELECT id FROM User WHERE user_id = ? ',user_id);
+  return users;
+}
+
 
 module.exports = {
   selectRepeatId,
@@ -110,5 +116,6 @@ module.exports = {
   selectUserId_UsernameAndPhone,
   selectIdNameNum,
   passwordReset,
-  alluser
+  alluser,
+  selectUserIdx_by_user_id
 };

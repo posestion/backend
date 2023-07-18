@@ -1,7 +1,7 @@
 
 const multer = require('multer');
 const upload = multer();
-const {imageUploader_profile} = require("../../../config/imageUploader");
+const {imageUploader_profile,imageUploader_board} = require("../../../config/imageUploader");
 module.exports = function (app) {
   const user = require("./userController");
   const jwtMiddleware = require("../../../config/jwtMiddleware");
@@ -33,4 +33,12 @@ module.exports = function (app) {
   //모든 사용자 정보 가져오기
   app.get("/app/getAllUsers",user.alluser);
 
+
+  app.post("/upload", jwtMiddleware, imageUploader_board.array("images", 10), function (req, res, next) {
+    //마지막 함수에 req에 이미지 파일과 userid 모두 넘어오는 거에요!!!
+    for(i=0;i<req.files.length;i++){
+      console.log(req.files[i].location);
+    }
+    res.send(req.verifiedToken.userId); 
+  });
 };

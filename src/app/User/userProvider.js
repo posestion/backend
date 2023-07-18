@@ -69,7 +69,7 @@ exports.check_id_name_num = async function (user_id, username, phone_num) {
   return idNameNum;
 };
 
-//모든 사용자 반환
+// 모든 사용자 반환
 exports.alluser = async function (){
   const connection = await pool.getConnection(async (conn) => conn);
 
@@ -78,4 +78,12 @@ exports.alluser = async function (){
   connection.release();
 
   return alluser;
+}
+
+// user_id 로 id 가져오기
+exports.getIdx_by_user_id = async function (user_id){
+  const connection = await pool.getConnection(async (conn) => conn);
+  const id = await userDao.selectUserIdx_by_user_id(connection, user_id);
+  connection.release();
+  return id[0].id;
 }
