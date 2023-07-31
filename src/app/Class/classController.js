@@ -5,7 +5,7 @@ const baseResponse = require("../../../config/baseResponseStatus");
 const { response, errResponse } = require("../../../config/response");
 const { imageUploader } = require("../../../config/imageUploader");
 const multer = require("multer");
-const moment = require('moment');
+const moment = require("moment");
 const userProvider = require("../../app/User/userProvider");
 const {deleteImageFromS3} = require("../../../config/imageUploader");
 
@@ -53,7 +53,7 @@ exports.createClass = async function (req, res){
     title,content,userIdx,images,date,tags
   );
   return res.send(response);
-}
+};
 
 exports.getClass  = async function (req, res){
   const id=req.params.id;

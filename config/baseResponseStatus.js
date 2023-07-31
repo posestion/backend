@@ -280,6 +280,30 @@ module.exports = {
     code: 400,
     message: "비밀번호 조건 불일치",
   },
+  // 포즈 장바구니 중복 저장 - 박예인
+  BASKET_REPEAT: {
+    isSuccess: false,
+    code: 400,
+    message: "포즈 장바구니에 해당 포즈 이미 존재",
+  },
+  // 포즈 상점 이미지 업로드 안 함
+  POSE_IMAGE_NULL: {
+    isSuccess: false,
+    code: 400,
+    message: "이미지 null",
+  },
+  // 포즈 상점 게시글 제목 입력 안 함
+  NO_TITLE: {
+    isSuccess: false,
+    code: 400,
+    message: "title 입력 안 함",
+  },
+  // 포즈 상점 게시글 내용 입력 안 함
+  NO_CONTENT: {
+    isSuccess: false,
+    code: 400,
+    message: "내용 입력 안 함",
+  },
   //Connection, Transaction 등의 서버 오류
   DB_ERROR: { isSuccess: false, code: 500, message: "데이터 베이스 에러" },
   SERVER_ERROR: { isSuccess: false, code: 500, message: "서버 에러" },
