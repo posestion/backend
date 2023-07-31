@@ -96,16 +96,18 @@ async function passwordReset(connection, newPw) {
 
 //모든 유저 반환
 async function alluser(connection) {
-  const [users] = await connection.query('SELECT * FROM User');
+  const [users] = await connection.query("SELECT * FROM User");
   return users;
 }
 
 //아이디로 고유번호 가져오기 -> 게시물에서 사용
-async function selectUserIdx_by_user_id(connection,user_id){
-  const [users] = await connection.query('SELECT id FROM User WHERE user_id = ? ',user_id);
+async function selectUserIdx_by_user_id(connection, user_id) {
+  const [users] = await connection.query(
+    "SELECT id FROM User WHERE user_id = ? ",
+    user_id
+  );
   return users;
 }
-
 
 module.exports = {
   selectRepeatId,
@@ -117,5 +119,5 @@ module.exports = {
   selectIdNameNum,
   passwordReset,
   alluser,
-  selectUserIdx_by_user_id
+  selectUserIdx_by_user_id,
 };

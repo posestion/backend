@@ -37,17 +37,16 @@ exports.postUsers = async function (req, res) {
     phone_num,
     birth,
     nickname,
-    username, 
+    username,
   } = await req.body;
 
   var imageURL;
-  if(req.file){
+  if (req.file) {
     imageURL = req.file.location;
-  }else{
+  } else {
     imageURL = null;
   }
 
-  
   console.log(imageURL);
   //1. 모두 null이 아닌지
   if (
@@ -61,7 +60,6 @@ exports.postUsers = async function (req, res) {
   ) {
     return res.send(baseResponse.USER_INFO_EMPTY);
   }
-
 
   //3.password
   if (!validatePassword(password)) {
@@ -141,7 +139,7 @@ exports.resetPw = async function (req, res) {
   if (!validatePassword(password)) {
     return res.send(baseResponse.PW_CONDITION_MISMATCH);
   }
-  if (result < 1) {
+  if (result.length < 1) {
     return res.send(baseResponse.USER_USERID_AND_PHONENUM_NOT_EXIST);
   }
 
@@ -150,12 +148,11 @@ exports.resetPw = async function (req, res) {
     return res.send(baseResponse.SIGNIN_PASSWORD_EMPTY);
   } else {
     return res.send(reset_pw);
-    // return res.send(response(baseResponse.SUCCESS, reset_pw));
   }
 };
 
 //alluser
-exports.alluser = async function (req, res){
+exports.alluser = async function (req, res) {
   const alluser = await userProvider.alluser();
   res.send(alluser);
-}
+};
