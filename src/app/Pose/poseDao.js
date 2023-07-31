@@ -65,6 +65,7 @@ async function inputview(connection, id, view) {
   const [newView] = await connection.query(query, [view, id]);
   return newView;
 }
+
 module.exports = {
   poseWrite,
   poseTag,

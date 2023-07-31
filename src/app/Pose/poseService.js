@@ -67,7 +67,6 @@ exports.viewUp = async function (id, view) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
     const input_posebasket = await poseDao.inputview(connection, id, view + 1);
-
     connection.release();
     return response(baseResponse.SUCCESS);
   } catch (err) {

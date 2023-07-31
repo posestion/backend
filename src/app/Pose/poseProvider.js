@@ -16,7 +16,6 @@ exports.getDetailpose = async function (id) {
   const detail = await poseDao.poseDetail(connection, id);
   // 조회수(view) 조회
   console.log(detail[0]["view"]);
-
   connection.release();
   return detail;
 };

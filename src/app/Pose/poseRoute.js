@@ -13,8 +13,10 @@ module.exports = function (app) {
     imageUploader_pose.single("image"),
     pose.postPose
   );
+
   // 포즈 장바구니 저장
   app.post("/pose/basket", jwtMiddleware, pose.poseBasket);
+
   // 포즈 상세 게시글
   app.get("/pose/:id", jwtMiddleware, pose.getPose);
 };

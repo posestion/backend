@@ -91,8 +91,10 @@ exports.poseBasket = async function (req, res) {
 exports.getPose = async function (req, res) {
   const id = req.params.id;
   const response = await poseProvider.getDetailpose(id);
+  // 조회수 +1
   const response_view = await poseService.viewUp(id, response[0]["view"]);
   console.log(response[0]["view"]);
+  // 조회수 +1 된 후 조회
   const Nresponse = await poseProvider.getDetailpose(id);
 
   return res.send(Nresponse);
