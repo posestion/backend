@@ -16,7 +16,7 @@ const { connect } = require("http2");
 
 exports.createPose = async function (
   date,
-  view,
+  // view,
   user_idx,
   title,
   content,
@@ -30,7 +30,7 @@ exports.createPose = async function (
 
     const connection = await pool.getConnection(async (conn) => conn);
     // tag 뺀 나머지 등록 하고 -> pose 자동 생성 id 얻고(?) -> tag 등록
-    const pose_info = [date, view, user_idx, title, content, pose_image];
+    const pose_info = [date, user_idx, title, content, pose_image];
     var pose = await poseDao.poseWrite(connection, pose_info);
     // pose 고유 생성 id 불러오기
     var pose_id = pose[0][0].id;
@@ -59,6 +59,19 @@ exports.saveBasket = async function (user_idx, pose_id, date) {
     return response(baseResponse.SUCCESS);
   } catch (err) {
     logger.error(`App - saveBasket Service error\n: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+// 조회수 +1
+exports.viewUp = async function (id, view) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+    const input_posebasket = await poseDao.inputview(connection, id, view + 1);
+
+    connection.release();
+    return response(baseResponse.SUCCESS);
+  } catch (err) {
+    logger.error(`App - viewUp Service error\n: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };

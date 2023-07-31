@@ -1,6 +1,7 @@
 const multer = require("multer");
 const upload = multer();
 const { imageUploader_pose } = require("../../../config/imageUploader");
+const jwtMiddleware = require("../../../config/jwtMiddleware");
 module.exports = function (app) {
   const pose = require("./poseController");
   const jwtMiddleware = require("../../../config/jwtMiddleware");
@@ -14,4 +15,6 @@ module.exports = function (app) {
   );
   // 포즈 장바구니 저장
   app.post("/pose/basket", jwtMiddleware, pose.poseBasket);
+  // 포즈 상세 게시글
+  app.get("/pose/:id", jwtMiddleware, pose.getPose);
 };

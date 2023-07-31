@@ -9,7 +9,7 @@ const multer = require("multer");
 const moment = require("moment");
 
 exports.postPose = async function (req, res) {
-  const { view, title, content, tag } = await req.body;
+  const { title, content, tag } = await req.body;
   console.log(tag);
   console.log(tag.length);
   console.log(Array.isArray(tag));
@@ -54,7 +54,7 @@ exports.postPose = async function (req, res) {
 
   const update = await poseService.createPose(
     date,
-    view,
+    // view,
     user_idx,
     title,
     content,
@@ -85,4 +85,15 @@ exports.poseBasket = async function (req, res) {
     const basket1 = await poseService.saveBasket(user_idx, pose_id, date);
     return res.send(basket1);
   }
+};
+
+// 포즈 상세 게시글 보기
+exports.getPose = async function (req, res) {
+  const id = req.params.id;
+  const response = await poseProvider.getDetailpose(id);
+  const response_view = await poseService.viewUp(id, response[0]["view"]);
+  console.log(response[0]["view"]);
+  const Nresponse = await poseProvider.getDetailpose(id);
+
+  return res.send(Nresponse);
 };
