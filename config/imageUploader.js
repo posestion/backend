@@ -1,8 +1,8 @@
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const { S3Client, PutObjectCommand ,DeleteObjectCommand } = require("@aws-sdk/client-s3");
 const path = require("path");
 const multer = require("multer");
 const multerS3 = require("multer-s3");
-const allowedExtensions = ['.png','.jpg','.jpeg','.bmp'];
+const allowedExtensions = ['.png','.jpg','.jpeg','.bmp','.PNG','.JPG','.JPEG','.BMP'];
 const {region,accessKeyId,secretAccessKey} = require("./s3");
 const s3 = new S3Client({
   region: region, 
@@ -48,4 +48,20 @@ const imageUploader_board = multer({
   }),
 });
 
-module.exports = {imageUploader_profile:imageUploader_profile, imageUploader_board:imageUploader_board};
+async function deleteImageFromS3(key) {
+  const params = {
+    Bucket: 'posestion-bucket', // 해당하는 S3 버킷 이름으로 바꿔야 합니다.
+    Key: key, // 삭제할 이미지의 키 (파일 이름)입니다.
+  };
+
+  try {
+    const command = new DeleteObjectCommand(params);
+    await s3.send(command);
+    console.log(`Image with key: ${key} deleted successfully from S3.`);
+  } catch (err) {
+    console.error('Error deleting image from S3:', err);
+    throw err; // 이미지 삭제에 실패하면 에러를 다시 던집니다.
+  }
+}
+
+module.exports = {imageUploader_profile:imageUploader_profile, imageUploader_board:imageUploader_board , deleteImageFromS3 : deleteImageFromS3};

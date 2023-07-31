@@ -106,6 +106,47 @@ async function selectUserIdx_by_user_id(connection,user_id){
   return users;
 }
 
+//selectFollow
+async function selectFollow(connection,param){
+  const [row] = await connection.query('SELECT * FROM follow WHERE  follower_id = ? AND user_id = ?',param);
+  //console.log("dao row: "+ row); 
+  return row;
+} 
+
+// 팔로우 추가하기
+async function addFollower(connection,followerIdx,userIdx){
+  const row = await connection.query('INSERT INTO follow(user_id,follower_id) VALUES (?  ,?)',[userIdx,followerIdx]);
+  return row;
+}
+
+//팔로우 취소하기
+async function cancelFollower(connection,followerIdx,userIdx){
+  const row = await connection.query('DELETE FROM follow where user_id= ? and follower_id=?',[userIdx,followerIdx]);
+  return row;
+}
+
+async function countFollower(connection,userIdx){
+  const count  =await connection.query(`SELECT COUNT(*) AS 'count' FROM follow WHERE user_id= ?`,userIdx);
+  return count;
+}
+
+async function updateUserExpertToTrue(connection,userIdx){
+  await connection.query(`UPDATE User
+  SET expert = true
+  WHERE id= ? ; `,userIdx);
+}
+
+async function updateUserExpertToFalse(connection,userIdx){
+  await connection.query(`UPDATE User
+  SET expert = false
+  WHERE id= ? ; `,userIdx);
+}
+
+async function getIsExpert(connection,userIdx){
+  const [expert] = await connection.query(`SELECT expert FROM User Where id= ?`,userIdx);
+  return expert;
+}
+
 
 module.exports = {
   selectRepeatId,
@@ -117,5 +158,12 @@ module.exports = {
   selectIdNameNum,
   passwordReset,
   alluser,
-  selectUserIdx_by_user_id
+  selectUserIdx_by_user_id,
+  selectFollow,
+  addFollower,
+  countFollower,
+  updateUserExpertToFalse,
+  updateUserExpertToTrue,
+  cancelFollower,
+  getIsExpert
 };

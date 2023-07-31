@@ -149,6 +149,100 @@ module.exports = {
     message: "사용자 정보를 모두 입력해주세요.",
   },
 
+  //노승아 - 팔로우 오류
+  FOLLOW_FOLLOWING_USER_NOT_EXIST : {
+    isSuccess: false,
+    code: 404,
+    message: "팔로우 하려는 사용자를 찾을 수 없습니다.",
+  },
+  FOLLOW_FOLLOWER_USER_NOT_EXIST : {
+    isSuccess: false,
+    code: 404,
+    message: "현재 로그인 된 사용자 계정에 오류가 있습니다. 다시 시도해주세요.",//? -> 
+  },
+  FOLLOW_ALREADY_FOLLOW : {
+    isSuccess: false,
+    code: 404,
+    message: "이미 팔로우하고 있습니다.",
+  },
+  FOLLOW_WERE_NOT_FOLLOWING : {
+    isSuccess: false,
+    code: 404,
+    message: "팔로우하고 있지 않았습니다.",
+  },
+  FOLLOW_CANT_FOLLOW_SELF : {
+    isSuccess: false,
+    code: 404,
+    message: "본인은 팔로우 할 수 없습니다.",
+  },
+
+  //노승아 - Class
+  CLASS_NOT_EXIST: {
+    isSuccess: false,
+    code: 404,
+    message: "해당 게시물이 없습니다.",
+  },
+  USER_IS_NOT_EXPERT: {
+    isSuccess: false,
+    code: 404,
+    message: "전문가가 아니기 때문에 클래스를 올릴 수 없습니다.",
+  },
+  FIND_USER_ERROR: {
+    isSuccess: false,
+    code: 404,
+    message: "사용자 정보를 가져오는데 에러가 발생 하였습니다. 다시 시도해주세요.",
+  },
+  CLASS_POST_REQUIRED_INFO_MISSING_ERROR : {
+    isSuccess: false,
+    code: 404,
+    message: "필수 정보가 누락 되었습니다. 제목을 입력해 주세요.",
+  },
+  CLASS_REVIEW_POST_REQUIRED_INFO_MISSING_ERROR : {
+    isSuccess: false,
+    code: 404,
+    message: "필수 정보가 누락 되었습니다. 점수과 리뷰 글을 모두 입력해 주세요.",
+  },
+  CLASS_WRITER_CANT_POST_REVIEW : {
+    isSuccess: false,
+    code: 404,
+    message: "클래스 작성자는 리뷰를 쓸 수 없습니다.",
+  },
+  CLASS_REVIEW_POST_ONLY_ONE_REVIEW_PER_CLASS : {
+    isSuccess: false,
+    code: 404,
+    message: "리뷰는 클래스 하나 당 하나만 작성 할 수 있습니다.",
+  },
+  CLASS_REVIEW_SCORE_BOUND_ERROR : {
+    isSuccess: false,
+    code: 404,
+    message: "점수는 1~5점 사이로 입력해주세요.",
+  },
+  CLASS_REVIEW_REVEIW_NOT_FOUND_ERROR : {
+    isSuccess: false,
+    code: 404,
+    message: "삭제할 리뷰를 찾을 수 없습니다.",
+  },
+  CLASS_ALREADY_DIBS : {
+    isSuccess: false,
+    code: 404,
+    message: "이미 찜한 게시물 입니다.",
+  },
+  CLASS_DIDNT_DIBS : {
+    isSuccess: false,
+    code: 404,
+    message: "찜하지 않았던 게시물 입니다.",
+  },
+  CLASS_WRITER_CANT_ADD_DIBS : {
+    isSuccess: false,
+    code: 404,
+    message: "작성자는 본인이 게시한 클래스를 찜할 수 없습니다.",
+  },
+  CLASS_DELETE_ONLY_WRITER : {
+    isSuccess: false,
+    code: 404,
+    message: "작성자만 클래스를 삭제 할 수 있습니다.",
+  },
+
   // Response error
   SIGNUP_REDUNDANT_EMAIL: {
     isSuccess: false,

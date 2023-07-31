@@ -141,3 +141,53 @@ exports.reset_password = async function (user_id, password) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+//팔로워 추가하기 + 사용자에 대해서 expert 여부 변경해주기
+exports.addFollower = async function (followerIdx,userIdx){
+  try{
+    const connection = await pool.getConnection(async (conn) => conn);
+    const result = await userDao.addFollower(connection,followerIdx,userIdx);
+    connection.release();
+    return result;
+    }
+    catch(err){
+      logger.error(`App - addFollower Service error\n: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+    }
+  }
+
+//팔로우 취소하기
+exports.cancelFollower = async function (followerIdx,userIdx){
+  try{
+    const connection = await pool.getConnection(async (conn) => conn);
+    const result = await userDao.cancelFollower(connection,followerIdx,userIdx);
+    connection.release();
+    return result;
+    }
+    catch(err){
+      logger.error(`App - addFollower Service error\n: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+    }
+  }
+
+//전문가 여부 update 하기
+exports.updateUserExpert = async function (userIdx){
+  try{
+    const connection = await pool.getConnection(async (conn) => conn);
+    const count = await userProvider.countFollower(userIdx);
+    if(count[0].count>= 2){ // 2명
+      await userDao.updateUserExpertToTrue(connection,userIdx);
+    }
+    // else{
+    //   await userDao.updateUserExpertToFalse(connection,userIdx);
+    // }
+    connection.release();
+
+  }
+  catch(err){
+    logger.error(`App - updateUserExpert Service error\n: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}
+
+//

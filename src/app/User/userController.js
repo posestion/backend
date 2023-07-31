@@ -65,7 +65,7 @@ exports.postUsers = async function (req, res) {
 
   //3.password
   if (!validatePassword(password)) {
-    return res.send(SIGNUP_PASSWORD_ERROR);
+    return res.send(baseResponse.SIGNUP_PASSWORD_ERROR);
   }
 
   const signUpResponse = await userService.createUser(
@@ -141,11 +141,12 @@ exports.resetPw = async function (req, res) {
   if (!validatePassword(password)) {
     return res.send(baseResponse.PW_CONDITION_MISMATCH);
   }
-  if (result < 1) {
+  if (result.length < 1) {
     return res.send(baseResponse.USER_USERID_AND_PHONENUM_NOT_EXIST);
   }
 
   const reset_pw = await userService.reset_password(user_id, password);
+
   if (!password) {
     return res.send(baseResponse.SIGNIN_PASSWORD_EMPTY);
   } else {
@@ -157,5 +158,37 @@ exports.resetPw = async function (req, res) {
 //alluser
 exports.alluser = async function (req, res){
   const alluser = await userProvider.alluser();
-  res.send(alluser);
+  return res.send(alluser);
 }
+
+
+exports.follow = async function (req,res){
+  const followerIdx = await userProvider.getIdx_by_user_id(req.verifiedToken.userId);
+  const userIdx = await userProvider.getIdx_by_user_id(req.params.userId);
+  if(!followerIdx){return res.send(baseResponse.FOLLOW_FOLLOWER_USER_NOT_EXIST)}
+  if(!userIdx){return res.send(baseResponse.FOLLOW_FOLLOWING_USER_NOT_EXIST)}
+  if(userIdx == followerIdx){return res.send(baseResponse.FOLLOW_CANT_FOLLOW_SELF)}
+  const selectFollow = await userProvider.selectFollow(followerIdx,userIdx);
+  if(selectFollow.length > 0){ return res.send(baseResponse.FOLLOW_ALREADY_FOLLOW);}//"이미 팔로우하고 있습니다."
+  else{
+    await userService.addFollower(followerIdx,userIdx);
+    await userService.updateUserExpert(userIdx);
+    return res.send(baseResponse.SUCCESS);
+  }
+}
+
+exports.cancelfollow = async function(req,res){
+  const followerIdx = await userProvider.getIdx_by_user_id(req.verifiedToken.userId);
+  const userIdx = await userProvider.getIdx_by_user_id(req.params.userId);
+  if(!followerIdx){return res.send(baseResponse.FOLLOW_FOLLOWER_USER_NOT_EXIST)}
+  if(!userIdx){return res.send(baseResponse.FOLLOW_FOLLOWING_USER_NOT_EXIST)}
+  const selectFollow = await userProvider.selectFollow(followerIdx,userIdx);
+  if(selectFollow.length<=0){return res.send(baseResponse.FOLLOW_WERE_NOT_FOLLOWING)}//팔로우 하고 있지 않음.
+  else {
+    await userService.cancelFollower(followerIdx,userIdx);
+    return res.send(baseResponse.SUCCESS);
+  }
+}
+
+
+

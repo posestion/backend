@@ -41,4 +41,10 @@ module.exports = function (app) {
     }
     res.send(req.verifiedToken.userId); 
   });
+
+  app.get("/app/follow/:userId",jwtMiddleware,user.follow);
+
+  app.get("/app/cancelFollow/:userId",jwtMiddleware,user.cancelfollow);
+
+  
 };
