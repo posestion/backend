@@ -140,7 +140,6 @@ exports.resetPw = async function (req, res) {
     return res.send(baseResponse.PW_CONDITION_MISMATCH);
   }
   if (result.length < 1) {
-  if (result.length < 1) {
     return res.send(baseResponse.USER_USERID_AND_PHONENUM_NOT_EXIST);
   }
 
