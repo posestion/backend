@@ -121,3 +121,10 @@ exports.getImagesUrlByClassId = async function(class_id){
   connection.release();
   return result;
 }
+
+exports.getAllClass = async function(){
+  const connection = await pool.getConnection(async (conn) => conn);
+  const result = await classDao.getAllClass(connection);
+  connection.release();
+  return result;
+}
