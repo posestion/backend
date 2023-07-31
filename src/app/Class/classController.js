@@ -286,6 +286,11 @@ exports.deleteClass = async function(req,res){
   return res.send(result);
 }
 
+exports.getAllClass = async function(req,res){
+  const result = await classProvider.getAllClass();
+  return res.send(result);
+}
+
 
 
 

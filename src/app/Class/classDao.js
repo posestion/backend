@@ -271,6 +271,11 @@ async function deleteClass(connection,class_id){
   );
 }
 
+async function getAllClass(connection){
+  const result = await connection.query(`SELECT * FROM board_class`);
+  return result[0];
+}
+
 module.exports = {
   createClass,
   createImages,
@@ -293,5 +298,6 @@ module.exports = {
   getMyDibs,
   getReviewWriterIdByReviewId,
   getImagesUrlByClassId,
-  deleteClass
+  deleteClass,
+  getAllClass
 };
