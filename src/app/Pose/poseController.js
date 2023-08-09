@@ -10,6 +10,10 @@ const moment = require("moment");
 
 exports.postPose = async function (req, res) {
   const { title, content, tag } = await req.body;
+
+  if (!tag) {
+    return res.send(baseResponse.TAG_NULL);
+  }
   console.log(tag);
   console.log(tag.length);
   console.log(Array.isArray(tag));
@@ -54,7 +58,6 @@ exports.postPose = async function (req, res) {
 
   const update = await poseService.createPose(
     date,
-    // view,
     user_idx,
     title,
     content,
@@ -67,7 +70,11 @@ exports.postPose = async function (req, res) {
 // 포즈 장바구니 저장
 exports.poseBasket = async function (req, res) {
   const { pose_id } = await req.body;
-
+  // 포즈상점에 없는 포즈일 경우
+  const poseid_TF = await poseProvider.check_pose_id(pose_id);
+  if (poseid_TF.length == 0) {
+    return res.send(baseResponse.POSE_ID_NULL);
+  }
   // 당일 날짜
   const date = await moment().format("YYYY-MM-DD");
 
@@ -90,12 +97,139 @@ exports.poseBasket = async function (req, res) {
 // 포즈 상세 게시글 보기
 exports.getPose = async function (req, res) {
   const id = req.params.id;
-  const response = await poseProvider.getDetailpose(id);
+  // 해당되는 pose_id 없을 시
+  const poseid_TF = await poseProvider.check_pose_id(id);
+  if (poseid_TF.length == 0) {
+    return res.send(baseResponse.POSE_ID_NULL);
+  }
+  // 상세 게시글 조회(태그 포함)
+  const result = await poseProvider.getDetailpose(id);
+  console.log(result);
   // 조회수 +1
-  const response_view = await poseService.viewUp(id, response[0]["view"]);
-  console.log(response[0]["view"]);
+  const response_view = await poseService.viewUp(id, result[0][0]["view"]);
+  console.log(result[0]["view"]);
   // 조회수 +1 된 후 조회
   const Nresponse = await poseProvider.getDetailpose(id);
+  // return res.send(Nresponse);
+  return res.send(response(baseResponse.SUCCESS, Nresponse));
+};
 
-  return res.send(Nresponse);
+// 포즈 장바구니 보기
+exports.allBasket = async function (req, res) {
+  const user_id = await userProvider.getIdx_by_user_id(
+    req.verifiedToken.userId
+  );
+  const basket = await poseProvider.basketAll(user_id);
+  return res.send(response(baseResponse.SUCCESS, basket));
+};
+
+// 포즈상점 전체 보기
+exports.allView = async function (req, res) {
+  const result = await poseProvider.allStore();
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+// 검색
+exports.poseSearch = async function (req, res) {
+  const { word } = await req.body;
+  if (!word) {
+    // 띄어쓰기만 한 것도 에러메시지에 포함?
+    return res.send(baseResponse.SEARCH_NULL);
+  }
+  const result = await poseProvider.searchWord(word);
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+// 포즈 삭제
+exports.poseDelete = async function (req, res) {
+  const user_id = await userProvider.getIdx_by_user_id(
+    req.verifiedToken.userId
+  );
+  const pose_id = req.params.id; // pose_id
+  // 입력한 pose_id가 포즈상점에 없을 때
+  const poseid_TF = await poseProvider.check_pose_id(pose_id);
+  if (poseid_TF.length == 0) {
+    return res.send(baseResponse.POSE_ID_NULL);
+  }
+  // 입력한 pose_id가 장바구니에 없을 때
+  const basket_poseid_TF = await poseProvider.check_basket_pose(
+    pose_id,
+    user_id
+  );
+  if (basket_poseid_TF.length == 0) {
+    return res.send(baseResponse.BASKET_POSE_ID_NULL);
+  }
+
+  const result = await poseService.deletePose(user_id, pose_id);
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+// 즐겨찾기 추가
+exports.addFavorite = async function (req, res) {
+  const user_id = await userProvider.getIdx_by_user_id(
+    req.verifiedToken.userId
+  );
+  const pose_id = req.params.id;
+  // 입력한 pose_id가 없을 때
+  const poseid_TF = await poseProvider.check_pose_id(pose_id);
+  if (poseid_TF.length == 0) {
+    return res.send(baseResponse.POSE_ID_NULL);
+  }
+  // 에러메시지 - 중복된 포즈 즐겨찾기에 넣으려고 할 때
+  // db에서 이미 저장된 {user_idx, pose_id}인지 확인
+  const dbRead = await poseProvider.fav_readIds(user_id, pose_id);
+  console.log(dbRead);
+  if (dbRead.length > 0) {
+    return res.send(baseResponse.FAV_REPEAT);
+  } else {
+    const result = await poseService.addFav(user_id, pose_id);
+    return res.send(response(baseResponse.SUCCESS, result));
+  }
+};
+
+// 즐겨찾기 제거
+exports.delFavorite = async function (req, res) {
+  const user_id = await userProvider.getIdx_by_user_id(
+    req.verifiedToken.userId
+  );
+  const pose_id = req.params.id;
+  // 입력한 pose_id가 없을 때
+  const poseid_TF = await poseProvider.check_pose_id(pose_id);
+  if (poseid_TF.length == 0) {
+    return res.send(baseResponse.POSE_ID_NULL);
+  }
+  // 입력한 pose_id가 즐겨찾기에 없을 때
+  const fav_poseid_TF = await poseProvider.check_fav_pose(pose_id, user_id);
+  if (fav_poseid_TF.length == 0) {
+    return res.send(baseResponse.FAV_POSE_ID_NULL);
+  }
+
+  const response = await poseService.delFav(user_id, pose_id);
+  return res.send(response);
+};
+
+// 즐겨찾기 조회(좋아요)
+exports.favoriteView = async function (req, res) {
+  const user_id = await userProvider.getIdx_by_user_id(
+    req.verifiedToken.userId
+  );
+  const result = await poseProvider.favView(user_id);
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+// hot 조회
+exports.hotBoard = async function (req, res) {
+  const result = await poseProvider.viewHot();
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+// 필터(인기순) 조회
+exports.filterpopular = async function (req, res) {
+  const result = await poseProvider.filpop();
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+// 필터(최신순) 조회
+exports.filterdate = async function (req, res) {
+  const result = await poseProvider.fildate();
+  return res.send(response(baseResponse.SUCCESS, result));
 };
