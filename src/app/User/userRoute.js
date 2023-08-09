@@ -46,5 +46,4 @@ module.exports = function (app) {
 
   app.get("/app/cancelFollow/:userId",jwtMiddleware,user.cancelfollow);
 
-  
 };

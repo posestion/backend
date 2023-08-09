@@ -128,3 +128,10 @@ exports.getAllClass = async function(){
   connection.release();
   return result;
 }
+
+exports.getSearchPage = async function(userIdx,content){
+  const connection = await pool.getConnection(async (conn) => conn);
+  const result = await classDao.getSearchPage(connection,userIdx,content);
+  connection.release();
+  return result;
+}

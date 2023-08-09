@@ -9,7 +9,6 @@ exports.user_id_check = async function (user_id) {
   const connection = await pool.getConnection(async (conn) => conn);
   const result = await userDao.selectUserId(connection, user_id);
   connection.release();
-
   return result;
 };
 
@@ -84,6 +83,20 @@ exports.alluser = async function (){
 exports.getIdx_by_user_id = async function (user_id){
   const connection = await pool.getConnection(async (conn) => conn);
   const id = await userDao.selectUserIdx_by_user_id(connection, user_id);
+  
+  //만약 해당하는 사용자가 없다면 -> 새로 추가한거!
+  if(!id[0]){
+    return null;
+  }
+
+  connection.release();
+  return id[0].id;
+}
+
+// user_id 로 id 가져오기
+exports.getIdx_by_nickname = async function (nickname){
+  const connection = await pool.getConnection(async (conn) => conn);
+  const id = await userDao.getIdx_by_nickname(connection,nickname );
   
   //만약 해당하는 사용자가 없다면 -> 새로 추가한거!
   if(!id[0]){

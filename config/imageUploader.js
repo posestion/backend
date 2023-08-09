@@ -48,6 +48,23 @@ const imageUploader_board = multer({
   }),
 });
 
+const imageUploader_wdyt = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: "posestion-bucket",
+    key: async function (req, file, callback) {
+      const uploadDirectory = "wdyt";
+      const extension = path.extname(file.originalname);
+      if (!allowedExtensions.includes(extension)) {
+        return callback(new Error("wrong extension"));
+      }
+      const user_id = await req.verifiedToken.userId;
+      callback(null, `${uploadDirectory}/${user_id}_${Date.now()}${extension}`); // 각 이미지마다 고유한 이름을 생성
+    },
+    acl: "public-read-write",
+  }),
+});
+
 const imageUploader_pose = multer({
   storage: multerS3({
     s3: s3,
@@ -87,4 +104,4 @@ async function deleteImageFromS3(key) {
 
 
 module.exports = {imageUploader_profile:imageUploader_profile,   imageUploader_pose: imageUploader_pose,
-  imageUploader_board:imageUploader_board , deleteImageFromS3 : deleteImageFromS3};
+  imageUploader_board:imageUploader_board , deleteImageFromS3 : deleteImageFromS3 , imageUploader_wdyt : imageUploader_wdyt};

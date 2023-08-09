@@ -291,6 +291,17 @@ exports.getAllClass = async function(req,res){
   return res.send(result);
 }
 
+exports.getSearchPage = async function(req,res){
+  const content = req.query.content.split(" ");
+  console.log(content);
+  // 사용자 user_id 로 id 가져오기 -> 변수에 저장
+  const userIdx = await userProvider.getIdx_by_user_id(req.verifiedToken.userId);
+  if(!userIdx){
+    return res.send(baseResponse.FIND_USER_ERROR); //"사용자 정보를 가져오는데 에러가 발생 하였습니다. 다시 시도해주세요."
+  }
+  const result = await classProvider.getSearchPage(userIdx,content);
+  return res.send(response(baseResponse.SUCCESS,[{"count":result.length},result]));
+}
 
 
 

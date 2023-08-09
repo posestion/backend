@@ -38,6 +38,7 @@ exports.postUsers = async function (req, res) {
     birth,
     nickname,
     username,
+    introduction
   } = await req.body;
 
   var imageURL;
@@ -65,6 +66,10 @@ exports.postUsers = async function (req, res) {
   if (!validatePassword(password)) {
     return res.send(baseResponse.SIGNUP_PASSWORD_ERROR);
   }
+  // 자기 소개 20자 이하인지
+  if(introduction.length > 20){
+    return res.send(baseResponse.SIGNUP_INTRODUCTION_ERROR);
+  }
 
   const signUpResponse = await userService.createUser(
     marketing_agreement,
@@ -74,7 +79,8 @@ exports.postUsers = async function (req, res) {
     birth,
     nickname,
     username,
-    imageURL //
+    imageURL,
+    introduction //
   );
 
   return res.send(signUpResponse);
