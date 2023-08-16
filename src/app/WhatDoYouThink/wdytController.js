@@ -269,3 +269,28 @@ exports.getSearchPage = async function(req,res){
   const result = await wdytProvider.getSearchPage(userIdx,content);
   return res.send(response(baseResponse.SUCCESS,[{"count":result.length},result]));
 }
+
+exports.deleteWdyt = async function(req,res){
+  const id=req.params.id; 
+
+  // 게시글이 있는지 확인
+  const isExist = await wdytProvider.getWdytIsExist(id);
+  if(isExist.length <=0){
+    return res.send(baseResponse.WDYT_NOT_EXISTS);
+  }
+
+   // 사용자 user_id 로 id 가져오기 -> 변수에 저장
+   const userIdx = await userProvider.getIdx_by_user_id(req.verifiedToken.userId);
+   if(!userIdx){
+     return res.send(baseResponse.FIND_USER_ERROR); //"사용자 정보를 가져오는데 에러가 발생 하였습니다. 다시 시도해주세요."
+   }
+
+  // 게시글 작성자와 지우려는 사람의 아이디가 같은지 확인.
+  const writer_id = await wdytProvider.getWdytWriterIdx(id); // class_id로 class 작성자 id 가져와서 비교
+  if(userIdx != writer_id[0].user_id){
+    return res.send(baseResponse.WDYT_DELETE_ONLY_WRITER); 
+  }
+  const images= await wdytProvider.getImagesUrlByWdytId(id);
+  const result = await wdytService.deleteWdyt(id,images);
+  return res.send(result);
+}

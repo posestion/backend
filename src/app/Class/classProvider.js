@@ -35,6 +35,13 @@ exports.checkAlreadyDibs = async function (userIdx, id){
   return result;
 }
 
+// 이미 수강중인 건지
+exports.checkAlreadyRegister = async function (userIdx, id){
+  const connection = await pool.getConnection(async (conn) => conn);
+  const result = await classDao.checkAlreadyRegister(connection,userIdx,id);
+  connection.release();
+  return result;
+}
 exports.addLike = async function(userIdx,id){
   const connection = await pool.getConnection(async (conn) => conn);
   const result = await classDao.addLike(connection,userIdx,id);
@@ -63,6 +70,14 @@ exports.cancelDibs = async function(userIdx,id){
   connection.release();
   return result;
 }
+
+exports.addRegister = async function(userIdx,id){
+  const connection = await pool.getConnection(async (conn) => conn);
+  const result = await classDao.addRegister(connection,userIdx,id);
+  connection.release();
+  return result;
+}
+
 
 
 exports.getClassWriterByClassId = async function(class_id){

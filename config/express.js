@@ -23,6 +23,8 @@ module.exports = function () {
   require("../src/app/Pose/poseRoute")(app);
   require("../src/app/WhatDoYouThink/wdytRoute")(app);
   require("../src/app/ProfilePage/profileRoute")(app);
+  require("../src/app/CustomerService/csRoute")(app);
+
 
 
   // require('../src/app/Board/boardRoute')(app);

@@ -57,17 +57,17 @@ exports.postUsers = async function (req, res) {
     !phone_num ||
     !birth ||
     !nickname ||
-    !username
+    !username 
   ) {
     return res.send(baseResponse.USER_INFO_EMPTY);
   }
 
   //3.password
-  if (!validatePassword(password)) {
+  if ( !validatePassword(password)) {
     return res.send(baseResponse.SIGNUP_PASSWORD_ERROR);
   }
   // 자기 소개 20자 이하인지
-  if(introduction.length > 20){
+  if( introduction && introduction.length > 20){
     return res.send(baseResponse.SIGNUP_INTRODUCTION_ERROR);
   }
 

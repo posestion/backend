@@ -53,6 +53,20 @@ exports.getCommentWriterIdx = async function(id){
   return result;
 }
 
+exports.getWdytWriterIdx = async function(id){
+  const connection = await pool.getConnection(async (conn) => conn);
+  const result = await wdytDao.getWdytWriterIdx(connection,id);
+  connection.release();
+  return result;
+}
+
+exports.getImagesUrlByWdytId = async function(id){
+  const connection = await pool.getConnection(async (conn) => conn);
+  const result = await wdytDao.getImagesUrlByWdytId(connection,id);
+  connection.release();
+  return result;
+}
+
 exports.getSearchPage = async function(useridx,content){
   const connection = await pool.getConnection(async (conn) => conn);
   const result = await wdytDao.getSearchPage(connection,useridx,content);

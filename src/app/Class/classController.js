@@ -74,6 +74,47 @@ exports.getClass  = async function (req, res){
   return res.send(response(baseResponse.SUCCESS,result));
 }
 
+exports.addRegister = async function(req,res){
+  const id=req.params.id;
+  
+  // 클래스가 있는지 확인
+  const isExist = await classProvider.getClassIsExist(id);
+  if(isExist.length <=0){
+    return res.send(baseResponse.CLASS_NOT_EXIST);
+  }
+
+  // 사용자 user_id 로 id 가져오기 -> 변수에 저장
+  const userIdx = await userProvider.getIdx_by_user_id(req.verifiedToken.userId);
+  if(!userIdx){
+     return res.send(baseResponse.FIND_USER_ERROR); //"사용자 정보를 가져오는데 에러가 발생 하였습니다. 다시 시도해주세요."
+  }
+
+ // 이미 수강 중인건지 확인
+   const checkAlreadyRegister= await classProvider.checkAlreadyRegister(userIdx,id);
+   if(checkAlreadyRegister.length>0){
+     return res.send({
+      isSuccess: false,
+      code: 400,
+      message: "이미 수강중입니다.",
+    });
+   }
+
+  // 작성자와 수강하려는 사람 같은지 확인 -> 같은면 찜 불가
+   const writer_id = await classProvider.getClassWriterByClassId(id);
+     if(writer_id[0].user_id == userIdx){
+       return res.send({
+        isSuccess: false,
+        code: 400,
+        message: "본인 클래스는 수강할 수 없습니다.",
+      }); 
+     }
+  
+  // 찜 하기
+  await classProvider.addRegister(userIdx,id);
+  return res.send(baseResponse.SUCCESS);
+
+}
+
 exports.addDibs = async function (req,res){
   const id=req.params.id;
   

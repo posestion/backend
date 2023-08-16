@@ -112,3 +112,16 @@ exports.delFav = async function (user_id, pose_id) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+//포즈 삭제 완전히
+exports.deletePoseWrite = async function(id){
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+    const result = await poseDao.deletePoseWrite(connection, id);
+    connection.release();
+    return response(baseResponse.SUCCESS);
+  } catch (err) {
+    logger.error(`App - deletePoseWrite Service error\n: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}

@@ -31,7 +31,10 @@ exports.createUser = async function (
     if (id_result.length > 0) {
       return baseResponse.SIGNUP_REDUNDANT_ID;
     }
-
+    const nickname_result = await userProvider.retrieveRepeatName(nickname);
+    if(nickname_result.length >0 ){
+      return baseResponse.SIGNUP_REDUNDANT_NICKNAME;
+    }
 
 
     // 비밀번호 암호화

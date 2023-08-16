@@ -117,3 +117,10 @@ exports.check_fav_pose = async function (pose_id, user_id) {
   connection.release();
   return result;
 };
+
+exports.getPoseWriterByPoseId = async function (id) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  const result = await poseDao.getPoseWriterByPoseId(connection, id);
+  connection.release();
+  return result;
+};

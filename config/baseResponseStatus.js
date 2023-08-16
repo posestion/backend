@@ -295,6 +295,22 @@ module.exports = {
     code: 404,
     message: "자기 소개는 20글자 이하로 써주세요.",
   },
+  // 닉네임 자기소개 에러
+  PROFILE_FIND_NICKNAME_ERROR:{
+    isSuccess: false,
+    code: 404,
+    message: "해당 닉네임을 가진 사용자가 없습니다.",
+  },
+  POSE_DELETE_ONLY_WRITER: {
+    isSuccess: false,
+    code: 404,
+    message: "작성자만 포즈를 삭제 할 수 있습니다.",
+  },
+  WDYT_DELETE_ONLY_WRITER: {
+    isSuccess: false,
+    code: 404,
+    message: "작성자만 게시글을 삭제 할 수 있습니다.",
+  },
   
   // Response error
   SIGNUP_REDUNDANT_EMAIL: {

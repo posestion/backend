@@ -33,5 +33,7 @@ module.exports = function (app) {
   // 검색 
   app.get("/app/class/search",jwtMiddleware,board_class.getSearchPage);
 
+  // 수강하기
+  app.get("/app/class/register/:id",jwtMiddleware,board_class.addRegister);
 
 }

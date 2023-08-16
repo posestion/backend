@@ -101,4 +101,22 @@ exports.deleteComment = async function (id){
     return errResponse(baseResponse.DB_ERROR);
   }
 }
- 
+
+exports.deleteWdyt = async function(id,images){
+  const separator = 'posestion-bucket.s3.us-east-1.amazonaws.com/';
+  try{
+    const connection = await pool.getConnection(async (conn) => conn);
+    await wdytDao.deleteWdyt(connection,id);
+    connection.release();
+    for(i=0;i<images.length;i++){
+        // 문자열에서 구분자(separator)를 기준으로 자르기
+        var index = (images[i].image_url).indexOf(separator);
+        var result = (images[i].image_url).slice(index + separator.length);
+        await deleteImageFromS3(result);
+    }
+    return response(baseResponse.SUCCESS);
+  }catch(err){
+    logger.error(`App - deleteWdyt Service error\n: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}

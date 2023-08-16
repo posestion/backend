@@ -58,3 +58,9 @@ exports.getUserProfile = async function(userIdx,profileIdx){
   connection.release();
   return result;
 }
+exports.getMyPage = async function(userIdx){
+  const connection = await pool.getConnection(async (conn) => conn);
+  const result = await profileDao.getMyPage(connection,userIdx);
+  connection.release();
+  return result;
+}

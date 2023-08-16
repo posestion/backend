@@ -101,6 +101,15 @@ async function checkAlreadyDibs(connection, userId, id) {
   return result[0];
 }
 
+//checkAlreadyRegister
+async function checkAlreadyRegister(connection, userId, id) {
+  const result = await connection.query(
+    `SELECT * FROM board_class_register d WHERE class_id = ? and user_id = ? `,
+    [id, userId]
+  );
+  return result[0];
+}
+
 async function addLike(connection, userId, id) {
   await connection.query(
     `Insert INTO board_class_like(user_id,class_id) VALUES (? , ?)`,
@@ -118,6 +127,13 @@ async function cancelLike(connection, userId, id) {
 async function addDibs(connection, userId, id) {
   await connection.query(
     `Insert INTO board_class_dibs(user_id,class_id) VALUES (? , ?)`,
+    [userId, id]
+  );
+}
+
+async function addRegister(connection,userId,id){
+  await connection.query(
+    `Insert INTO board_class_register(user_id,class_id) VALUES (? , ?)`,
     [userId, id]
   );
 }
@@ -228,13 +244,15 @@ LIMIT 4;`,
     FROM
     board_class c
     LEFT OUTER JOIN
+    board_class_register r ON (c.id = r.class_id AND r.user_id = ?)
+    LEFT OUTER JOIN
     board_class_dibs d ON (c.id = d.class_id AND d.user_id = ?)
     LEFT OUTER JOIN
     board_class_image i ON (c.id = i.class_id AND i.sequence = 0) 
-    where c.user_id = ?
+    where r.user_id = ?
     order by c.id desc
     LIMIT 4;`,
-    [user_id, user_id]
+    [user_id, user_id ,user_id]
   );
   return [{"myclass" : myClass[0]} ,{"dibs" : dibs[0]}];
 }
@@ -247,12 +265,14 @@ async function getMyClass(connection, user_id) {
     FROM
     board_class c
     LEFT OUTER JOIN
+    board_class_register r ON (c.id = r.class_id AND r.user_id = ?)
+    LEFT OUTER JOIN
     board_class_dibs d ON (c.id = d.class_id AND d.user_id = ?)
     LEFT OUTER JOIN
     board_class_image i ON (c.id = i.class_id AND i.sequence = 0) 
-    where c.user_id = ?
+    where r.user_id = ?
     order by c.id desc`,
-    [user_id, user_id]
+    [user_id, user_id,user_id]
   );
   return myClass[0];
 }
@@ -321,6 +341,7 @@ module.exports = {
   getImagesUrlByClassId,
   deleteClass,
   getAllClass,
-  getSearchPage
-  
+  getSearchPage,
+  addRegister,
+  checkAlreadyRegister
 };

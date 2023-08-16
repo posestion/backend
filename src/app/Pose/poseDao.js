@@ -1,3 +1,9 @@
+const {deleteImageFromS3} = require("../../../config/imageUploader");
+
+// 이미지 지우기
+async function deleteImages(images){
+  for(i=0;i<images.length;i++){ await (deleteImageFromS3(images[i].key));}
+}
 // 포즈상점 게시물 작성
 async function poseWrite(connection, pose_info) {
   const Query = `
@@ -294,6 +300,31 @@ async function fav_repeatPose(connection, user_idx, pose_id) {
   const [check] = await connection.query(query, [user_idx, pose_id]);
   return check;
 }
+
+async function getPoseWriterByPoseId(connection,id){
+  const result = await connection.query(
+    `SELECT user_id FROM Pose_write WHERE id = ?`,
+    id
+  );
+  return result[0];
+}
+
+async function deletePoseWrite (connection,id){
+  const separator = 'posestion-bucket.s3.us-east-1.amazonaws.com/';
+  var image_url = await connection.query(
+    `SELECT pose_image FROM Pose_write WHERE id = ?`,
+    id
+  );
+  console.log(image_url[0][0].pose_image);
+  image_url=image_url[0][0].pose_image
+  var index = (image_url).indexOf(separator);
+  var result = (image_url).slice(index + separator.length);
+  await deleteImageFromS3(result);
+  await connection.query(
+    `DELETE FROM Pose_write WHERE id = ?`,
+    id
+  );
+}
 module.exports = {
   poseWrite,
   poseTag,
@@ -317,4 +348,6 @@ module.exports = {
   basket_pose_check,
   fav_pose_check,
   fav_repeatPose,
+  getPoseWriterByPoseId,
+  deletePoseWrite
 };

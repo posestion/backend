@@ -153,6 +153,13 @@ async function getCommentWriterIdx(connection,id){
   return result[0];
 }
 
+//getWdytWriterIdx
+async function getWdytWriterIdx(connection,id){
+  const result = await connection.query(
+    `SELECT user_id FROM board_WhatDoYouThink WHERE id = ?`,[id]
+  )
+  return result[0];
+}
 //deleteComment
 async function deleteComment(connection,id){
   const result = await connection.query(
@@ -182,6 +189,20 @@ async function getSearchPage(connection,userIdx,content){
   return result[0];
 }
 
+//getImagesUrlByWdytId
+async function getImagesUrlByWdytId(connection,id){
+  const result = await connection.query(`SELECT image_url FROM board_WhatDoYouThink_images WHERE board_WhatDoYouThink_id = ?`,id);
+  return result[0];
+}
+
+//deleteWdyt
+async function deleteWdyt(connection,id){
+  await connection.query(
+    `DELETE FROM board_WhatDoYouThink WHERE id = ?`,
+    id
+  );
+}
+
 
 module.exports = {
   createWdyt,
@@ -199,5 +220,8 @@ module.exports = {
   getPage,
   getCommentWriterIdx,
   deleteComment,
-  getSearchPage
+  getSearchPage,
+  getWdytWriterIdx,
+  getImagesUrlByWdytId,
+  deleteWdyt
 };

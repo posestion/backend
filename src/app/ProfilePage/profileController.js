@@ -60,12 +60,12 @@ exports.getUserClass = async function (req,res){
    }
    const nickname = req.params.nickname;
    if(!nickname){
-      return res.send("닉네임 없음");
+      return res.send(baseResponse.PROFILE_FIND_NICKNAME_ERROR);
    }
    // 닉네임으로 idx 가져오기
    const profileIdx = await userProvider.getIdx_by_nickname(nickname);
    if(!profileIdx){
-      return res.send(baseResponse.FIND_USER_ERROR); //"사용자 정보를 가져오는데 에러가 발생 하였습니다. 다시 시도해주세요."}
+      return res.send(baseResponse.PROFILE_FIND_NICKNAME_ERROR);  //"사용자 정보를 가져오는데 에러가 발생 하였습니다. 다시 시도해주세요."}
    }
    const result = await profileProvider.getUserClass(userIdx,profileIdx);
    return res.send(response(baseResponse.SUCCESS,result));
@@ -80,12 +80,12 @@ exports.getUserContent = async function (req,res){
    }
    const nickname = req.params.nickname;
    if(!nickname){
-      return res.send("닉네임 없음");
+      return res.send(baseResponse.PROFILE_FIND_NICKNAME_ERROR);
    }
    // 닉네임으로 idx 가져오기
    const profileIdx = await userProvider.getIdx_by_nickname(nickname);
    if(!profileIdx){
-      return res.send(baseResponse.FIND_USER_ERROR); //"사용자 정보를 가져오는데 에러가 발생 하였습니다. 다시 시도해주세요."}
+      return res.send(baseResponse.PROFILE_FIND_NICKNAME_ERROR);  //"사용자 정보를 가져오는데 에러가 발생 하였습니다. 다시 시도해주세요."}
    }
    const result = await profileProvider.getUserContent(userIdx,profileIdx);
    return res.send(response(baseResponse.SUCCESS,result));
@@ -100,13 +100,25 @@ exports.getUserProfile = async function (req,res){
    }
    const nickname = req.params.nickname;
    if(!nickname){
-      return res.send("닉네임 없음");
+      return res.send(baseResponse.PROFILE_FIND_NICKNAME_ERROR);
    }
    // 닉네임으로 idx 가져오기
    const profileIdx = await userProvider.getIdx_by_nickname(nickname);
    if(!profileIdx){
-      return res.send(baseResponse.FIND_USER_ERROR); //"사용자 정보를 가져오는데 에러가 발생 하였습니다. 다시 시도해주세요."}
+      return res.send(baseResponse.PROFILE_FIND_NICKNAME_ERROR); //"사용자 정보를 가져오는데 에러가 발생 하였습니다. 다시 시도해주세요."}
    }
    const result = await profileProvider.getUserProfile(userIdx,profileIdx);
+   return res.send(response(baseResponse.SUCCESS,result));
+}
+
+//getMyPage
+exports.getMyPage = async function (req,res){
+   // 사용자 user_id 로 id 가져오기 -> 변수에 저장
+   const userIdx = await userProvider.getIdx_by_user_id(req.verifiedToken.userId);
+   if(!userIdx){
+      return res.send(baseResponse.FIND_USER_ERROR); //"사용자 정보를 가져오는데 에러가 발생 하였습니다. 다시 시도해주세요."}
+   }
+
+   const result = await profileProvider.getMyPage(userIdx);
    return res.send(response(baseResponse.SUCCESS,result));
 }

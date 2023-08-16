@@ -30,11 +30,10 @@ module.exports = function (app) {
   app.get("/app/profile/:nickname/content",jwtMiddleware,profileController.getUserContent);
 
   // 마이페이지
-  //app.get("/app/myPage/:nickname/content",jwtMiddleware,profileController.getUserContent);
+  app.get("/app/myPage",jwtMiddleware,profileController.getMyPage);
 
   // 전문가, 일반인 페이지
   app.get("/app/profile/:nickname",jwtMiddleware,profileController.getUserProfile);
-
 
 }
 

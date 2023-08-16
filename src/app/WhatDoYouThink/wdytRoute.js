@@ -33,9 +33,9 @@ module.exports = function (app) {
   app.get("/app/wdyt",jwtMiddleware,wdytController.getPage);
 
   //이사잘 검색 페이지
-  app.get("/app/wdty/search",jwtMiddleware,wdytController.getSearchPage);
+  app.get("/app/wdyt/search",jwtMiddleware,wdytController.getSearchPage);
 
   // 이사잘 삭제
-  
+  app.get("/app/wdyt/delete/:id",jwtMiddleware,wdytController.deleteWdyt);
 
 }

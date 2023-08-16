@@ -37,4 +37,7 @@ module.exports = function (app) {
   app.get("/pose/filterpopular", jwtMiddleware, pose.filterpopular);
   // 필터(최신순)
   app.get("/pose/filterdate", jwtMiddleware, pose.filterdate);
+
+  // 포즈 삭제
+  app.get("/pose/delete/:id",jwtMiddleware,pose.delPose);
 };
