@@ -6,7 +6,10 @@ const userDao = require("./userDao");
 const baseResponse = require("../../../config/baseResponseStatus");
 const { response } = require("../../../config/response");
 const { errResponse } = require("../../../config/response");
-const { imageUploader, allowedExtensions } = require("../../../config/imageUploader");
+const {
+  imageUploader,
+  allowedExtensions,
+} = require("../../../config/imageUploader");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const { connect } = require("http2");
@@ -31,8 +34,6 @@ exports.createUser = async function (
       return baseResponse.SIGNUP_REDUNDANT_ID;
     }
 
-
-
     // 비밀번호 암호화
     const hashedPassword = await crypto
       .createHash("sha512")
@@ -47,7 +48,7 @@ exports.createUser = async function (
       birth,
       nickname,
       username,
-      imageURL
+      imageURL,
     ];
 
     const connection = await pool.getConnection(async (conn) => conn);
@@ -143,51 +144,92 @@ exports.reset_password = async function (user_id, password) {
 };
 
 //팔로워 추가하기 + 사용자에 대해서 expert 여부 변경해주기
-exports.addFollower = async function (followerIdx,userIdx){
-  try{
+exports.addFollower = async function (followerIdx, userIdx) {
+  try {
     const connection = await pool.getConnection(async (conn) => conn);
-    const result = await userDao.addFollower(connection,followerIdx,userIdx);
+    const result = await userDao.addFollower(connection, followerIdx, userIdx);
     connection.release();
     return result;
-    }
-    catch(err){
-      logger.error(`App - addFollower Service error\n: ${err.message}`);
+  } catch (err) {
+    logger.error(`App - addFollower Service error\n: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
-    }
   }
+};
 
 //팔로우 취소하기
-exports.cancelFollower = async function (followerIdx,userIdx){
-  try{
+exports.cancelFollower = async function (followerIdx, userIdx) {
+  try {
     const connection = await pool.getConnection(async (conn) => conn);
-    const result = await userDao.cancelFollower(connection,followerIdx,userIdx);
+    const result = await userDao.cancelFollower(
+      connection,
+      followerIdx,
+      userIdx
+    );
     connection.release();
     return result;
-    }
-    catch(err){
-      logger.error(`App - addFollower Service error\n: ${err.message}`);
+  } catch (err) {
+    logger.error(`App - addFollower Service error\n: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
-    }
   }
+};
 
 //전문가 여부 update 하기
-exports.updateUserExpert = async function (userIdx){
-  try{
+exports.updateUserExpert = async function (userIdx) {
+  try {
     const connection = await pool.getConnection(async (conn) => conn);
     const count = await userProvider.countFollower(userIdx);
-    if(count[0].count>= 2){ // 2명
-      await userDao.updateUserExpertToTrue(connection,userIdx);
+    if (count[0].count >= 2) {
+      // 2명
+      await userDao.updateUserExpertToTrue(connection, userIdx);
     }
     // else{
     //   await userDao.updateUserExpertToFalse(connection,userIdx);
     // }
     connection.release();
-
-  }
-  catch(err){
+  } catch (err) {
     logger.error(`App - updateUserExpert Service error\n: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
-}
+};
 
-//
+// 회원 정보 수정
+exports.changeuser = async function (
+  user_id,
+  nickname,
+  password,
+  birth,
+  phone_num,
+  introduction,
+  imageURL
+) {
+  try {
+    //닉네임 중복 확인
+    // const nickname_result = await userProvider.retrieveRepeatName(nickname);
+
+    // if (nickname_result.length > 0) {
+    //   return baseResponse.SIGNUP_REDUNDANT_NICKNAME;
+    // }
+
+    // 비밀번호 암호화
+    const hashedPassword = await crypto
+      .createHash("sha512")
+      .update(password)
+      .digest("hex");
+
+    const connection = await pool.getConnection(async (conn) => conn);
+    const result = await userDao.infoChange(
+      connection,
+      user_id,
+      nickname,
+      hashedPassword,
+      birth,
+      introduction,
+      imageURL
+    );
+    connection.release();
+    return response(baseResponse.SUCCESS);
+  } catch (err) {
+    logger.error(`App - changeuser Service error\n: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

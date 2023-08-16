@@ -21,6 +21,7 @@ module.exports = function () {
   require("../src/app/User/userRoute")(app);
   require("../src/app/Class/classRoute")(app);
   require("../src/app/Pose/poseRoute")(app);
+  require("../src/app/board/boardRoute")(app);
 
   // require('../src/app/Board/boardRoute')(app);
 
