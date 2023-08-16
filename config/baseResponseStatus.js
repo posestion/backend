@@ -82,6 +82,11 @@ module.exports = {
     code: 404,
     message: "해당 회원이 존재하지 않습니다.",
   },
+  TENsPhoto_ID_NOT_EXIST: {
+    isSuccess: false,
+    code: 404,
+    message: "해당 10초 사진이 존재하지 않습니다.",
+  },
 
   USER_USEREMAIL_EMPTY: {
     isSuccess: false,

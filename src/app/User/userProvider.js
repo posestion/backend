@@ -69,7 +69,7 @@ exports.check_id_name_num = async function (user_id, username, phone_num) {
 };
 
 // 모든 사용자 반환
-exports.alluser = async function (){
+exports.alluser = async function () {
   const connection = await pool.getConnection(async (conn) => conn);
 
   const alluser = await userDao.alluser(connection);
@@ -77,21 +77,21 @@ exports.alluser = async function (){
   connection.release();
 
   return alluser;
-}
+};
 
 // user_id 로 id 가져오기
-exports.getIdx_by_user_id = async function (user_id){
+exports.getIdx_by_user_id = async function (user_id) {
   const connection = await pool.getConnection(async (conn) => conn);
   const id = await userDao.selectUserIdx_by_user_id(connection, user_id);
-  
+
   //만약 해당하는 사용자가 없다면 -> 새로 추가한거!
-  if(!id[0]){
+  if (!id[0]) {
     return null;
   }
 
   connection.release();
   return id[0].id;
-}
+};
 
 // user_id 로 id 가져오기
 exports.getIdx_by_nickname = async function (nickname){
@@ -108,24 +108,24 @@ exports.getIdx_by_nickname = async function (nickname){
 }
 
 // 팔로우 , 팔로잉 한 관계인지 확인하기.
-exports.selectFollow = async function (followerIdx,userIdx){
+exports.selectFollow = async function (followerIdx, userIdx) {
   const connection = await pool.getConnection(async (conn) => conn);
-  const result = await userDao.selectFollow(connection, [followerIdx,userIdx]);
+  const result = await userDao.selectFollow(connection, [followerIdx, userIdx]);
   connection.release();
   return result;
-}
+};
 
-exports.countFollower = async function(userIdx){
+exports.countFollower = async function (userIdx) {
   const connection = await pool.getConnection(async (conn) => conn);
   const count = await userDao.countFollower(connection, userIdx);
   connection.release();
   return count[0];
-}
+};
 
 //getIsExpert
-exports.getIsExpert = async function(userIdx){
+exports.getIsExpert = async function (userIdx) {
   const connection = await pool.getConnection(async (conn) => conn);
-  const isExpert = await userDao.getIsExpert(connection,userIdx);
+  const isExpert = await userDao.getIsExpert(connection, userIdx);
   connection.release();
   return isExpert[0].expert;
-}
+};

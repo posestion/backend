@@ -26,6 +26,7 @@ module.exports = function () {
   require("../src/app/CustomerService/csRoute")(app);
 
 
+  require("../src/app/board/boardRoute")(app);
 
   // require('../src/app/Board/boardRoute')(app);
 

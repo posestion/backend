@@ -119,46 +119,202 @@ async function getIdx_by_nickname(connection, nickname) {
 }
 
 //selectFollow
-async function selectFollow(connection,param){
-  const [row] = await connection.query('SELECT * FROM follow WHERE  follower_id = ? AND user_id = ?',param);
-  //console.log("dao row: "+ row); 
+async function selectFollow(connection, param) {
+  const [row] = await connection.query(
+    "SELECT * FROM follow WHERE  follower_id = ? AND user_id = ?",
+    param
+  );
+  //console.log("dao row: "+ row);
   return row;
-} 
+}
 
 // 팔로우 추가하기
-async function addFollower(connection,followerIdx,userIdx){
-  const row = await connection.query('INSERT INTO follow(user_id,follower_id) VALUES (?  ,?)',[userIdx,followerIdx]);
+async function addFollower(connection, followerIdx, userIdx) {
+  const row = await connection.query(
+    "INSERT INTO follow(user_id,follower_id) VALUES (?  ,?)",
+    [userIdx, followerIdx]
+  );
   return row;
 }
 
 //팔로우 취소하기
-async function cancelFollower(connection,followerIdx,userIdx){
-  const row = await connection.query('DELETE FROM follow where user_id= ? and follower_id=?',[userIdx,followerIdx]);
+async function cancelFollower(connection, followerIdx, userIdx) {
+  const row = await connection.query(
+    "DELETE FROM follow where user_id= ? and follower_id=?",
+    [userIdx, followerIdx]
+  );
   return row;
 }
 
-async function countFollower(connection,userIdx){
-  const count  =await connection.query(`SELECT COUNT(*) AS 'count' FROM follow WHERE user_id= ?`,userIdx);
+async function countFollower(connection, userIdx) {
+  const count = await connection.query(
+    `SELECT COUNT(*) AS 'count' FROM follow WHERE user_id= ?`,
+    userIdx
+  );
   return count;
 }
 
-async function updateUserExpertToTrue(connection,userIdx){
-  await connection.query(`UPDATE User
+async function updateUserExpertToTrue(connection, userIdx) {
+  await connection.query(
+    `UPDATE User
   SET expert = true
-  WHERE id= ? ; `,userIdx);
+  WHERE id= ? ; `,
+    userIdx
+  );
 }
 
-async function updateUserExpertToFalse(connection,userIdx){
-  await connection.query(`UPDATE User
+async function updateUserExpertToFalse(connection, userIdx) {
+  await connection.query(
+    `UPDATE User
   SET expert = false
-  WHERE id= ? ; `,userIdx);
+  WHERE id= ? ; `,
+    userIdx
+  );
 }
 
-async function getIsExpert(connection,userIdx){
-  const [expert] = await connection.query(`SELECT expert FROM User Where id= ?`,userIdx);
+async function getIsExpert(connection, userIdx) {
+  const [expert] = await connection.query(
+    `SELECT expert FROM User Where id= ?`,
+    userIdx
+  );
   return expert;
 }
 
+// // 회원 정보 수정
+// async function infoChange(
+//   connection,
+//   user_id,
+//   nickname,
+//   hashedPassword,
+//   birth,
+//   introduction,
+//   imageURL
+// ) {
+
+//   // 프로필 사진 변경 안 할 때
+//   if (!imageURL) {
+//     const query = `
+//     UPDATE User
+//     SET nickname=? , password=? , birth=? , introduction=?
+//     WHERE id=?
+//     `;
+//     // 닉네임 안바뀌면 밑에것도 안바뀜?
+//     const [result] = await connection.query(query, [
+//       nickname,
+//       hashedPassword,
+//       birth,
+//       introduction,
+//       user_id,
+//     ]);
+//   } else {
+//     const query = `
+//     UPDATE User
+//     SET nickname=? , password=? , birth=? , profile_image=? , introduction=?
+//     WHERE id=?
+//     `;
+//     // 닉네임 안바뀌면 밑에것도 안바뀜?
+//     const [result] = await connection.query(query, [
+//       nickname,
+//       hashedPassword,
+//       birth,
+//       imageURL,
+//       introduction,
+//       user_id,
+//     ]);
+//   }
+
+//   return result;
+// }
+
+// async function infoChange(
+//   connection,
+//   user_id,
+//   nickname,
+//   hashedPassword,
+//   birth,
+//   introduction,
+//   imageURL
+// ) {
+//   let result;
+//   // 프로필 사진 안바꿀 때
+//   if (!imageURL) {
+//     const query = `
+//     UPDATE User
+//     SET nickname=?, password=?, birth=?, introduction=?
+//     WHERE id=?
+//     `;
+//     const [queryResult] = await connection.query(query, [
+//       nickname,
+//       hashedPassword,
+//       birth,
+//       introduction,
+//       user_id,
+//     ]);
+//     result = queryResult;
+//   } else {
+//     // 프로필 사진 바꿀 때
+//     const query = `
+//     UPDATE User
+//     SET nickname=?, password=?, birth=?, profile_image=?, introduction=?
+//     WHERE id=?
+//     `;
+//     const [queryResult] = await connection.query(query, [
+//       nickname,
+//       hashedPassword,
+//       birth,
+//       imageURL,
+//       introduction,
+//       user_id,
+//     ]);
+//     result = queryResult;
+//   }
+//   // 한줄소개 안바꿀 때?
+
+//   return result;
+// }
+
+async function infoChange(
+  connection,
+  user_id,
+  nickname,
+  hashedPassword,
+  birth,
+  introduction,
+  imageURL
+) {
+  // 프로필 사진 바꿀 때
+  const query = `
+UPDATE User
+SET 
+  nickname = ?,
+  password = ?,
+  ${birth ? "birth = ?," : " "}   
+  ${imageURL ? "profile_image = ?," : " "}       
+  ${introduction ? "introduction = ?," : " "}
+WHERE id = ?;
+`;
+
+  const queryParams = [nickname, hashedPassword];
+
+  if (birth) {
+    queryParams.push(birth); //-- birth 값을 배열에 추가
+  }
+
+  if (imageURL) {
+    queryParams.push(imageURL); // -- imageURL 값을 배열에 추가
+  }
+
+  if (introduction) {
+    queryParams.push(introduction); // -- introduction 값을 배열에 추가
+  }
+
+  queryParams.push(user_id); // -- user_id 값을 배열에 추가
+  console.log(queryParams);
+
+  const [queryResult] = await connection.query(query, queryParams);
+
+  return queryResult;
+}
 
 module.exports = {
   selectRepeatId,
@@ -178,5 +334,6 @@ module.exports = {
   updateUserExpertToTrue,
   cancelFollower,
   getIsExpert,
-  getIdx_by_nickname
+  getIdx_by_nickname,
+  infoChange,
 };
