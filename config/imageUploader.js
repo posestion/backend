@@ -174,21 +174,13 @@ async function deleteImageFromS3(key) {
   }
 }
 
-module.exports = {
-  imageUploader_profile: imageUploader_profile,
-  imageUploader_pose: imageUploader_pose,
-  imageUploader_board: imageUploader_board,
-  deleteImageFromS3: deleteImageFromS3,
-  imageUploader_tensPhoto: imageUploader_tensPhoto,
-};
 
-module.exports = {
-  imageUploader_profile: imageUploader_profile,
-  imageUploader_pose: imageUploader_pose,
-  imageUploader_board: imageUploader_board,
-  deleteImageFromS3: deleteImageFromS3,
-  imageUploader_wdyt: imageUploader_wdyt,
-};
 
-module.exports = {imageUploader_profile:imageUploader_profile,   imageUploader_pose: imageUploader_pose,
-  imageUploader_board:imageUploader_board , deleteImageFromS3 : deleteImageFromS3 , imageUploader_wdyt : imageUploader_wdyt , fileUploader_inquiry : fileUploader_inquiry};
+module.exports = {imageUploader_profile:imageUploader_profile,   
+  imageUploader_pose: imageUploader_pose,
+  imageUploader_board:imageUploader_board , 
+  deleteImageFromS3 : deleteImageFromS3 ,
+   imageUploader_wdyt : imageUploader_wdyt , 
+   fileUploader_inquiry : fileUploader_inquiry
+   ,imageUploader_tensPhoto: imageUploader_tensPhoto
+  };
