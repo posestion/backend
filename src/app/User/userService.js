@@ -24,7 +24,8 @@ exports.createUser = async function (
   birth,
   nickname,
   username,
-  imageURL
+  imageURL,
+  introduction
 ) {
   try {
     //id 중복 확인
@@ -49,6 +50,7 @@ exports.createUser = async function (
       nickname,
       username,
       imageURL,
+      introduction,
     ];
 
     const connection = await pool.getConnection(async (conn) => conn);

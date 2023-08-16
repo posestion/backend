@@ -53,6 +53,10 @@ module.exports = function (app) {
   app.get("/app/follow/:userId", jwtMiddleware, user.follow);
 
   app.get("/app/cancelFollow/:userId", jwtMiddleware, user.cancelfollow);
+
+  app.get("/app/follow/:userId", jwtMiddleware, user.follow);
+
+  app.get("/app/cancelFollow/:userId", jwtMiddleware, user.cancelfollow);
   // 회원 정보 수정
   app.patch(
     "/app/userchange",

@@ -1,8 +1,8 @@
 // 유저 생성
 async function insertUserInfo(connection, insertUserInfoParams) {
   const insertUserInfoQuery = `
-        INSERT INTO User(marketing_agreement,user_id,password,phone_num,birth,nickname,username,profile_image)
-        VALUES (?, ?, ?, ?, ?, ?,?,?);
+        INSERT INTO User(marketing_agreement,user_id,password,phone_num,birth,nickname,username,profile_image,introduction)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ? , ?);
     `;
 
   const insertUserInfoRow = await connection.query(
@@ -105,6 +105,15 @@ async function selectUserIdx_by_user_id(connection, user_id) {
   const [users] = await connection.query(
     "SELECT id FROM User WHERE user_id = ? ",
     user_id
+  );
+  return users;
+}
+
+//getIdx_by_nickname
+async function getIdx_by_nickname(connection, nickname) {
+  const [users] = await connection.query(
+    "SELECT id FROM User WHERE nickname = ? ",
+    nickname
   );
   return users;
 }
@@ -325,5 +334,6 @@ module.exports = {
   updateUserExpertToTrue,
   cancelFollower,
   getIsExpert,
+  getIdx_by_nickname,
   infoChange,
 };

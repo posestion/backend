@@ -27,14 +27,11 @@ module.exports = function (app) {
   // 클래스 삭제 
   app.get("/app/class/deleteClass/:id",jwtMiddleware,board_class.deleteClass);
 
-
   // 클래스 전체 가져오기
   app.get("/app/class/getAllClass",board_class.getAllClass);
   
-  // 전문가 인기순위 -> 여기 말고 다른 파일에 둘 것! 
-
   // 검색 
-
+  app.get("/app/class/search",jwtMiddleware,board_class.getSearchPage);
 
 
 }

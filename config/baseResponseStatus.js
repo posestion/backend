@@ -249,7 +249,58 @@ module.exports = {
     code: 404,
     message: "작성자만 클래스를 삭제 할 수 있습니다.",
   },
+  // 노승아 - 이사잘
+  WDYT_NOT_EXISTS : {
+    isSuccess: false,
+    code: 404,
+    message: "게시글이 존재하지 않습니다.",
+  },
+  WDYT_LIKE_ERROR:{
+    isSuccess: false,
+    code: 404,
+    message: "이미 좋아요 한 게시글입니다.",
+  },
+  WDYT_CANCEL_LIKE_ERROR:{
+    isSuccess: false,
+    code: 404,
+    message: "좋아요를 누르지 않았던 게시글입니다.",
+  },
+  WDYT_FIND_PARENTCOMMENT_ERROR:{
+    isSuccess: false,
+    code: 404,
+    message: "부모 댓글을 찾을 수 없습니다.",
+  },
+  WDYT_COMMENT_NOT_EXIST:{
+    isSuccess: false,
+    code: 404,
+    message: "댓글을 찾을 수 없습니다.",
+  },
+  //이미 좋아요를 누른 댓글입니다.
+  WDYT_COMMENT_LIKE_ERROR:{
+    isSuccess: false,
+    code: 404,
+    message: "이미 좋아요를 누른 댓글입니다.",
+  },
+    //이미 좋아요를 누른 댓글입니다.
+  WDYT_COMMENT_CANCEL_LIKE_ERROR:{
+    isSuccess: false,
+    code: 404,
+    message: "좋아요를 누르지 않았던 댓글입니다.",
+  },
+  //WDYT_COMMENT_DELETE_ERROR
+  WDYT_COMMENT_DELETE_ERROR:{
+    isSuccess: false,
+    code: 404,
+    message: "댓글을 삭제할 수 없습니다. 본인 댓글이 아닙니다.",
+  },
 
+  // 회원가입 자기소개 에러
+  SIGNUP_INTRODUCTION_ERROR:{
+    isSuccess: false,
+    code: 404,
+    message: "자기 소개는 20글자 이하로 써주세요.",
+  },
+  
   // Response error
   SIGNUP_REDUNDANT_EMAIL: {
     isSuccess: false,

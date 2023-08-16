@@ -183,11 +183,32 @@ ORDER BY hits desc;`,
   return result[0];
 }
 
+async function getSearchPage (connection, userIdx,content) {
+  console.log(content);
+  const tagQuery = content.map(tag => `t.tag_name LIKE '${tag}'`).join(' OR ');
+  console.log(tagQuery);
+  const result = await connection.query(
+    `SELECT
+  c.id, c.title, i.image_url, c.hits,
+  CASE WHEN d.class_id IS NOT NULL THEN true ELSE false END AS 'dibs'
+FROM
+  board_class c
+LEFT OUTER JOIN
+  board_class_dibs d ON (c.id = d.class_id AND d.user_id = ? )
+LEFT OUTER JOIN
+board_class_image i ON (c.id = i.class_id AND i.sequence = 0)
+WHERE c.id IN (SELECT DISTINCT class_id FROM board_class_tag t WHERE ${tagQuery});
+`,
+[userIdx]
+  );
+return result[0];
+}
+
 async function getDrawer(connection, user_id) {
   const dibs = await connection.query(
     `SELECT
   c.id, c.title, i.image_url, c.hits,
-  CASE WHEN d.class_id IS NOT NULL THEN 'true' ELSE 'false' END AS 'dibs'
+  CASE WHEN d.class_id IS NOT NULL THEN true ELSE false END AS 'dibs'
 FROM
   board_class c
 LEFT OUTER JOIN
@@ -203,7 +224,7 @@ LIMIT 4;`,
   const myClass = await connection.query(
     `SELECT
     c.id, c.title, i.image_url, c.hits,
-    CASE WHEN d.class_id IS NOT NULL THEN 'true' ELSE 'false' END AS 'dibs'
+    CASE WHEN d.class_id IS NOT NULL THEN true ELSE false END AS 'dibs'
     FROM
     board_class c
     LEFT OUTER JOIN
@@ -222,7 +243,7 @@ async function getMyClass(connection, user_id) {
   const myClass = await connection.query(
     `SELECT
     c.id, c.title, i.image_url, c.hits,
-    CASE WHEN d.class_id IS NOT NULL THEN 'true' ELSE 'false' END AS 'dibs'
+    CASE WHEN d.class_id IS NOT NULL THEN true ELSE false END AS 'dibs'
     FROM
     board_class c
     LEFT OUTER JOIN
@@ -240,7 +261,7 @@ async function getMyDibs(connection,user_id){
   const dibs = await connection.query(
     `SELECT
   c.id, c.title, i.image_url, c.hits,
-  CASE WHEN d.class_id IS NOT NULL THEN 'true' ELSE 'false' END AS 'dibs'
+  CASE WHEN d.class_id IS NOT NULL THEN true ELSE false END AS 'dibs'
 FROM
   board_class c
 LEFT OUTER JOIN
@@ -299,5 +320,7 @@ module.exports = {
   getReviewWriterIdByReviewId,
   getImagesUrlByClassId,
   deleteClass,
-  getAllClass
+  getAllClass,
+  getSearchPage
+  
 };
