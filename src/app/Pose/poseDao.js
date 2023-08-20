@@ -259,8 +259,12 @@ async function viewHotboard(connection) {
 // 필터(인기순) 조회
 async function filpopular(connection) {
   const [result] = await connection.query(`
-  SELECT * ,DATE_FORMAT(date, '%Y-%m-%d') as date, (SELECT count(*) FROM Pose_fav WHERE pose_id = a.id) AS "fav_count"
-  FROM Pose_write a order by view desc;
+  SELECT * ,DATE_FORMAT(date, '%Y-%m-%d') as date, (SELECT count(*) FROM Pose_fav WHERE pose_id = a.id) AS "fav_count", GROUP_CONCAT(b.tag_name) as tag_name
+  FROM Pose_write a
+  LEFT JOIN Pose_tag b ON a.id = b.pose_id
+  GROUP BY a.id
+  order by view desc
+  ;
   `);
   return result;
 }
@@ -268,8 +272,11 @@ async function filpopular(connection) {
 // 필터(최신순) 조회
 async function filterDate(connection) {
   const [result] = await connection.query(`
-  SELECT *,DATE_FORMAT(date, '%Y-%m-%d') as date , (SELECT count(*) FROM Pose_fav where pose_id = p.id) AS "fav_count"
-  FROM Pose_write p order by date desc; 
+  SELECT *,DATE_FORMAT(date, '%Y-%m-%d') as date , (SELECT count(*) FROM Pose_fav where pose_id = p.id) AS "fav_count", GROUP_CONCAT(b.tag_name) as tag_name
+  FROM Pose_write p
+  LEFT JOIN Pose_tag b ON p.id = b.pose_id
+  GROUP BY p.id
+  order by date desc; 
   `);
   return result;
 }
@@ -362,11 +369,13 @@ async function getAgeGroup(connection, birth) {
   const [result] = await connection.query(query);
   const ageRange = result[0].age_group;
   const Query = `
-  SELECT a.*,DATE_FORMAT(date, '%Y-%m-%d') as date
+  SELECT a.*,DATE_FORMAT(date, '%Y-%m-%d') as date, GROUP_CONCAT(b.tag_name) as tag_name
   FROM Pose_write a
   JOIN User u ON a.user_id = u.id
+  LEFT JOIN Pose_tag b ON a.id = b.pose_id
   WHERE 
     u.birth ${ageRange}
+  group by a.id;
   `;
 
   const [result1] = await connection.query(Query);
