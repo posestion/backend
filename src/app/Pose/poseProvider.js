@@ -126,10 +126,10 @@ exports.getPoseWriterByPoseId = async function (id) {
 };
 
 // 연령대별
-exports.getAgeGroup = async function (user_id) {
+exports.getAge = async function (user_id) {
   const connection = await pool.getConnection(async (conn) => conn);
   const birth = await poseDao.getBirthday(connection, user_id);
-  const result = await poseDao.getAgeGroup(connection, birth[0]["age"]);
+  const result = await poseDao.ageGroupGet(connection, birth[0]["age"]);
   connection.release();
   return result;
 };

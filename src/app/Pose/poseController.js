@@ -242,7 +242,7 @@ exports.getAgeGroup = async function (req, res) {
   if (!user_id) {
     return res.send(baseResponse.FIND_USER_ERROR); //"사용자 정보를 가져오는데 에러가 발생 하였습니다. 다시 시도해주세요."
   }
-  const result = await poseProvider.getAgeGroup(user_id);
+  const result = await poseProvider.getAge(user_id);
   return res.send(response(baseResponse.SUCCESS, result));
 };
 

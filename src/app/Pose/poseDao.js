@@ -353,7 +353,7 @@ async function getBirthday(connection, user_id) {
   return result;
 }
 // 연령대별
-async function getAgeGroup(connection, birth) {
+async function ageGroupGet(connection, birth) {
   const query = `
     SELECT 
         CASE
@@ -409,5 +409,5 @@ module.exports = {
   getPoseWriterByPoseId,
   deletePoseWrite,
   getBirthday,
-  getAgeGroup,
+  ageGroupGet,
 };

@@ -37,7 +37,7 @@ module.exports = function (app) {
   // 필터(최신순)
   app.get("/pose/filterdate", jwtMiddleware, pose.filterdate);
   // 연령대별
-  app.get("/pose/getAgeGroup", jwtMiddleware, pose.getAgeGroup);
+  app.get("/pose/getAge", jwtMiddleware, pose.getAgeGroup);
   // 포즈 삭제
   app.get("/pose/delete/:id", jwtMiddleware, pose.delPose);
 };
