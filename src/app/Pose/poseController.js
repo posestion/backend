@@ -234,34 +234,47 @@ exports.filterdate = async function (req, res) {
   return res.send(response(baseResponse.SUCCESS, result));
 };
 
+// 연령대별 조회
+exports.getAgeGroup = async function (req, res) {
+  const user_id = await userProvider.getIdx_by_user_id(
+    req.verifiedToken.userId
+  );
+  if (!user_id) {
+    return res.send(baseResponse.FIND_USER_ERROR); //"사용자 정보를 가져오는데 에러가 발생 하였습니다. 다시 시도해주세요."
+  }
+  const result = await poseProvider.getAgeGroup(user_id);
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
 // 포즈 삭제
-exports.delPose = async function (req,res){
+exports.delPose = async function (req, res) {
+  // 포즈가 있는지 확인
+  const pose_id = req.params.id;
+  // 입력한 pose_id가 없을 때
+  const poseid_TF = await poseProvider.check_pose_id(pose_id);
+  if (poseid_TF.length == 0) {
+    return res.send(baseResponse.POSE_ID_NULL);
+  }
 
-    // 포즈가 있는지 확인
-    const pose_id = req.params.id;
-    // 입력한 pose_id가 없을 때
-    const poseid_TF = await poseProvider.check_pose_id(pose_id);
-    if (poseid_TF.length == 0) {
-      return res.send(baseResponse.POSE_ID_NULL);
-    }
-
-    const userIdx = await userProvider.getIdx_by_user_id(req.verifiedToken.userId);
-    if(!userIdx){
-      return res.send(baseResponse.FIND_USER_ERROR); //"사용자 정보를 가져오는데 에러가 발생 하였습니다. 다시 시도해주세요."
-    }
+  const userIdx = await userProvider.getIdx_by_user_id(
+    req.verifiedToken.userId
+  );
+  if (!userIdx) {
+    return res.send(baseResponse.FIND_USER_ERROR); //"사용자 정보를 가져오는데 에러가 발생 하였습니다. 다시 시도해주세요."
+  }
 
   // 클래스 작성자와 지우려는 사람의 아이디가 같은지 확인.
   // const writer_id = await classProvider.getClassWriterByClassId(id); // class_id로 class 작성자 id 가져와서 비교
   // if(userIdx != writer_id[0].user_id){
-  //   return res.send(baseResponse.CLASS_DELETE_ONLY_WRITER); 
+  //   return res.send(baseResponse.CLASS_DELETE_ONLY_WRITER);
   // }
   // 포즈 작성자와 지우려는 사람의 아이디가 같은지 확인
   const writer_id = await poseProvider.getPoseWriterByPoseId(pose_id);
-  if(userIdx != writer_id[0].user_id){
-    return res.send(baseResponse.POSE_DELETE_ONLY_WRITER); 
+  if (userIdx != writer_id[0].user_id) {
+    return res.send(baseResponse.POSE_DELETE_ONLY_WRITER);
   }
 
   //const images= await classProvider.getImagesUrlByClassId(id);
   const result = await poseService.deletePoseWrite(pose_id);
   return res.send(result);
-}
+};

@@ -1,8 +1,10 @@
-const {deleteImageFromS3} = require("../../../config/imageUploader");
+const { deleteImageFromS3 } = require("../../../config/imageUploader");
 
 // 이미지 지우기
-async function deleteImages(images){
-  for(i=0;i<images.length;i++){ await (deleteImageFromS3(images[i].key));}
+async function deleteImages(images) {
+  for (i = 0; i < images.length; i++) {
+    await deleteImageFromS3(images[i].key);
+  }
 }
 // 포즈상점 게시물 작성
 async function poseWrite(connection, pose_info) {
@@ -236,10 +238,13 @@ async function viewHotboard(connection) {
   ORDER BY frequency DESC;
   `);
   const Query = `
-  SELECT *,DATE_FORMAT(date, '%Y-%m-%d') as date
-  FROM Pose_write
-  where id=?
+  SELECT a.*,DATE_FORMAT(date, '%Y-%m-%d') as date , (SELECT count(*) FROM Pose_fav WHERE pose_id = a.id) AS "fav_count", JSON_ARRAYAGG(b.tag_name) as tag_name
+  FROM Pose_write a
+  LEFT JOIN Pose_tag b ON a.id = b.pose_id
+  WHERE a.id IN (?)
+  GROUP BY a.id
   `;
+
   const n_results = [];
   for (let i = 0; i < result.length; i++) {
     const [results] = await connection.query(Query, result[i]["pose_id"]);
@@ -301,7 +306,7 @@ async function fav_repeatPose(connection, user_idx, pose_id) {
   return check;
 }
 
-async function getPoseWriterByPoseId(connection,id){
+async function getPoseWriterByPoseId(connection, id) {
   const result = await connection.query(
     `SELECT user_id FROM Pose_write WHERE id = ?`,
     id
@@ -309,22 +314,66 @@ async function getPoseWriterByPoseId(connection,id){
   return result[0];
 }
 
-async function deletePoseWrite (connection,id){
-  const separator = 'posestion-bucket.s3.us-east-1.amazonaws.com/';
+// 포즈 삭제
+async function deletePoseWrite(connection, id) {
+  const separator = "posestion-bucket.s3.us-east-1.amazonaws.com/";
   var image_url = await connection.query(
     `SELECT pose_image FROM Pose_write WHERE id = ?`,
     id
   );
   console.log(image_url[0][0].pose_image);
-  image_url=image_url[0][0].pose_image
-  var index = (image_url).indexOf(separator);
-  var result = (image_url).slice(index + separator.length);
+  image_url = image_url[0][0].pose_image;
+  var index = image_url.indexOf(separator);
+  var result = image_url.slice(index + separator.length);
   await deleteImageFromS3(result);
-  await connection.query(
-    `DELETE FROM Pose_write WHERE id = ?`,
-    id
-  );
+  await connection.query(`DELETE FROM Pose_write WHERE id = ?`, id);
 }
+
+// 나이
+async function getBirthday(connection, user_id) {
+  const [result] = await connection.query(
+    `
+    SELECT ROUND((TO_DAYS(NOW()) - TO_DAYS(birth.date)) / 365) AS age
+    FROM (  
+      SELECT DATE_FORMAT(birth, '%Y-%m-%d') AS date
+      FROM User
+      WHERE id=?
+    ) AS birth
+    `,
+    user_id
+  );
+
+  return result;
+}
+// 연령대별
+async function getAgeGroup(connection, birth) {
+  const query = `
+    SELECT 
+        CASE
+            WHEN ${birth} BETWEEN 0 AND 9 THEN CONCAT('BETWEEN ''2014-01-01'' AND ''2023-12-31''')
+            WHEN ${birth} BETWEEN 10 AND 19 THEN CONCAT('BETWEEN ''2004-01-01'' AND ''2013-12-31''')
+            WHEN ${birth} BETWEEN 20 AND 29 THEN CONCAT('BETWEEN ''1994-01-01'' AND ''2003-12-31''')
+            WHEN ${birth} BETWEEN 30 AND 39 THEN CONCAT('BETWEEN ''1984-01-01'' AND ''1993-12-31''')
+            WHEN ${birth} BETWEEN 40 AND 49 THEN CONCAT('BETWEEN ''1974-01-01'' AND ''1983-12-31''')
+            ELSE '생일 입력 안 함'
+        END AS age_group
+  `;
+
+  const [result] = await connection.query(query);
+  const ageRange = result[0].age_group;
+  const Query = `
+  SELECT a.*,DATE_FORMAT(date, '%Y-%m-%d') as date
+  FROM Pose_write a
+  JOIN User u ON a.user_id = u.id
+  WHERE 
+    u.birth ${ageRange}
+  `;
+
+  const [result1] = await connection.query(Query);
+
+  return result1;
+}
+
 module.exports = {
   poseWrite,
   poseTag,
@@ -349,5 +398,7 @@ module.exports = {
   fav_pose_check,
   fav_repeatPose,
   getPoseWriterByPoseId,
-  deletePoseWrite
+  deletePoseWrite,
+  getBirthday,
+  getAgeGroup,
 };
