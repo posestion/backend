@@ -78,7 +78,7 @@ exports.favView = async function (user_id) {
   return result;
 };
 
-// hot 게시판 조회
+// hot 게시판(즐겨찾기 순) 조회
 exports.viewHot = async function () {
   const connection = await pool.getConnection(async (conn) => conn);
   const result = await poseDao.viewHotboard(connection);
@@ -86,7 +86,7 @@ exports.viewHot = async function () {
   return result;
 };
 
-// 필터(인기순) 조회
+// 필터(인기순-조회수 순) 조회
 exports.filpop = async function () {
   const connection = await pool.getConnection(async (conn) => conn);
   const result = await poseDao.filpopular(connection);
@@ -130,7 +130,6 @@ exports.getAgeGroup = async function (user_id) {
   const connection = await pool.getConnection(async (conn) => conn);
   const birth = await poseDao.getBirthday(connection, user_id);
   const result = await poseDao.getAgeGroup(connection, birth[0]["age"]);
-  console.log(result);
   connection.release();
   return result;
 };

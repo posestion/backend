@@ -5,7 +5,6 @@ const jwtMiddleware = require("../../../config/jwtMiddleware");
 module.exports = function (app) {
   const pose = require("./poseController");
   const jwtMiddleware = require("../../../config/jwtMiddleware");
-
   // 포즈상점 게시글 작성
   app.post(
     "/pose/write",
@@ -31,7 +30,7 @@ module.exports = function (app) {
   app.get("/pose/delfavorite/:id", jwtMiddleware, pose.delFavorite);
   // 즐겨찾기 조회(좋아요 게시판)
   app.get("/pose/favoriteview", jwtMiddleware, pose.favoriteView);
-  // hot 게시판 조회
+  // hot 게시판(즐겨찾기 수 순) 조회
   app.get("/pose/hotboard", jwtMiddleware, pose.hotBoard);
   // 필터(인기순(조회순))
   app.get("/pose/filterpopular", jwtMiddleware, pose.filterpopular);
@@ -39,7 +38,6 @@ module.exports = function (app) {
   app.get("/pose/filterdate", jwtMiddleware, pose.filterdate);
   // 연령대별
   app.get("/pose/getAgeGroup", jwtMiddleware, pose.getAgeGroup);
-
   // 포즈 삭제
   app.get("/pose/delete/:id", jwtMiddleware, pose.delPose);
 };
