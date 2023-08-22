@@ -259,26 +259,39 @@ async function viewHotboard(connection) {
 // 필터(인기순) 조회
 async function filpopular(connection) {
   const [result] = await connection.query(`
-  SELECT * ,DATE_FORMAT(date, '%Y-%m-%d') as date, (SELECT count(*) FROM Pose_fav WHERE pose_id = a.id) AS "fav_count", GROUP_CONCAT(b.tag_name) as tag_name
-  FROM Pose_write a
-  LEFT JOIN Pose_tag b ON a.id = b.pose_id
-  GROUP BY a.id
-  order by view desc
-  ;
+    SELECT *, 
+           DATE_FORMAT(date, '%Y-%m-%d') AS date, 
+           (SELECT COUNT(*) FROM Pose_fav WHERE pose_id = a.id) AS "fav_count", 
+           GROUP_CONCAT(b.tag_name) AS tag_names
+    FROM Pose_write a
+    LEFT JOIN Pose_tag b ON a.id = b.pose_id
+    GROUP BY a.id
+    ORDER BY view DESC;
   `);
-  return result;
+
+  return result.map((row) => ({
+    ...row,
+    tag_names: row.tag_names ? row.tag_names.split(",") : [],
+  }));
 }
 
 // 필터(최신순) 조회
 async function filterDate(connection) {
   const [result] = await connection.query(`
-  SELECT *,DATE_FORMAT(date, '%Y-%m-%d') as date , (SELECT count(*) FROM Pose_fav where pose_id = p.id) AS "fav_count", GROUP_CONCAT(b.tag_name) as tag_name
-  FROM Pose_write p
-  LEFT JOIN Pose_tag b ON p.id = b.pose_id
-  GROUP BY p.id
-  order by date desc; 
+    SELECT *, 
+           DATE_FORMAT(date, '%Y-%m-%d') AS date, 
+           (SELECT COUNT(*) FROM Pose_fav WHERE pose_id = p.id) AS "fav_count", 
+           GROUP_CONCAT(b.tag_name) AS tag_names
+    FROM Pose_write p
+    LEFT JOIN Pose_tag b ON p.id = b.pose_id
+    GROUP BY p.id
+    ORDER BY date DESC;
   `);
-  return result;
+
+  return result.map((row) => ({
+    ...row,
+    tag_names: row.tag_names ? row.tag_names.split(",") : [],
+  }));
 }
 
 // 입력한 pose_id 장바구니에 있는지 확인
@@ -368,19 +381,25 @@ async function ageGroupGet(connection, birth) {
 
   const [result] = await connection.query(query);
   const ageRange = result[0].age_group;
-  const Query = `
-  SELECT a.*,DATE_FORMAT(date, '%Y-%m-%d') as date, GROUP_CONCAT(b.tag_name) as tag_name
-  FROM Pose_write a
-  JOIN User u ON a.user_id = u.id
-  LEFT JOIN Pose_tag b ON a.id = b.pose_id
-  WHERE 
-    u.birth ${ageRange}
-  group by a.id;
+
+  const secondQuery = `
+    SELECT a.*, 
+           DATE_FORMAT(date, '%Y-%m-%d') AS date, 
+           GROUP_CONCAT(b.tag_name) AS tag_names
+    FROM Pose_write a
+    JOIN User u ON a.user_id = u.id
+    LEFT JOIN Pose_tag b ON a.id = b.pose_id
+    WHERE 
+      u.birth ${ageRange}
+    GROUP BY a.id;
   `;
 
-  const [result1] = await connection.query(Query);
+  const [result1] = await connection.query(secondQuery);
 
-  return result1;
+  return result1.map((row) => ({
+    ...row,
+    tag_names: row.tag_names ? row.tag_names.split(",") : [],
+  }));
 }
 
 module.exports = {
