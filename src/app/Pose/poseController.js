@@ -278,3 +278,27 @@ exports.delPose = async function (req, res) {
   const result = await poseService.deletePoseWrite(pose_id);
   return res.send(result);
 };
+
+// 연령대별 - 최신 순
+exports.ageNewest = async function (req, res) {
+  const user_id = await userProvider.getIdx_by_user_id(
+    req.verifiedToken.userId
+  );
+  if (!user_id) {
+    return res.send(baseResponse.FIND_USER_ERROR); //"사용자 정보를 가져오는데 에러가 발생 하였습니다. 다시 시도해주세요."
+  }
+  const result = await poseProvider.ageNewest(user_id);
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+// 연령대별 - 인기 순
+exports.agePopular = async function (req, res) {
+  const user_id = await userProvider.getIdx_by_user_id(
+    req.verifiedToken.userId
+  );
+  if (!user_id) {
+    return res.send(baseResponse.FIND_USER_ERROR); //"사용자 정보를 가져오는데 에러가 발생 하였습니다. 다시 시도해주세요."
+  }
+  const result = await poseProvider.agePopular(user_id);
+  return res.send(response(baseResponse.SUCCESS, result));
+};

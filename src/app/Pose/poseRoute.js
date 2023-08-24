@@ -38,6 +38,12 @@ module.exports = function (app) {
   app.get("/pose/filterdate", jwtMiddleware, pose.filterdate);
   // 연령대별
   app.get("/pose/getAge", jwtMiddleware, pose.getAgeGroup);
+  // 포즈 연령대별 - 최신순
+  app.get("/pose/ageNewest", jwtMiddleware, pose.ageNewest);
+  // 포즈 연령대별 - 인기순(조회순)
+  app.get("/pose/agePopular", jwtMiddleware, pose.agePopular);
+  // 연령대별 포즈 검색
+  // hot 포즈 검색
   // 포즈 삭제
   app.get("/pose/delete/:id", jwtMiddleware, pose.delPose);
 };

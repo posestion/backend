@@ -365,9 +365,15 @@ async function getBirthday(connection, user_id) {
 
   return result;
 }
+
 // 연령대별
-async function ageGroupGet(connection, birth) {
-  const query = `
+async function getPoseData(
+  connection,
+  birth,
+  orderByDate = false,
+  orderByView = false
+) {
+  const ageQuery = `
     SELECT 
         CASE
             WHEN ${birth} BETWEEN 0 AND 9 THEN CONCAT('BETWEEN ''2014-01-01'' AND ''2023-12-31''')
@@ -379,10 +385,10 @@ async function ageGroupGet(connection, birth) {
         END AS age_group
   `;
 
-  const [result] = await connection.query(query);
-  const ageRange = result[0].age_group;
+  const [ageResult] = await connection.query(ageQuery);
+  const ageRange = ageResult[0].age_group;
 
-  const secondQuery = `
+  let secondQuery = `
     SELECT a.*, 
            DATE_FORMAT(date, '%Y-%m-%d') AS date, 
            GROUP_CONCAT(b.tag_name) AS tag_names
@@ -391,15 +397,36 @@ async function ageGroupGet(connection, birth) {
     LEFT JOIN Pose_tag b ON a.id = b.pose_id
     WHERE 
       u.birth ${ageRange}
-    GROUP BY a.id;
+    GROUP BY a.id
   `;
 
-  const [result1] = await connection.query(secondQuery);
+  if (orderByDate) {
+    secondQuery += "ORDER BY a.date DESC;";
+  } else if (orderByView) {
+    secondQuery += "ORDER BY a.view desc;";
+  }
 
-  return result1.map((row) => ({
+  const [poseResult] = await connection.query(secondQuery);
+
+  return poseResult.map((row) => ({
     ...row,
     tag_names: row.tag_names ? row.tag_names.split(",") : [],
   }));
+}
+
+// 연령대별
+async function ageGroupGet(connection, birth) {
+  return await getPoseData(connection, birth);
+}
+
+// 연령대별 - 최신 순
+async function ageNewest(connection, birth) {
+  return await getPoseData(connection, birth, true, false);
+}
+
+// 연령대별 - 인기 순
+async function agePopular(connection, birth) {
+  return await getPoseData(connection, birth, false, true);
 }
 
 module.exports = {
@@ -429,4 +456,6 @@ module.exports = {
   deletePoseWrite,
   getBirthday,
   ageGroupGet,
+  ageNewest,
+  agePopular,
 };

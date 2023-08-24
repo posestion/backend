@@ -1,6 +1,9 @@
 const { pool } = require("../../../config/database");
 const { logger } = require("../../../config/winston");
+const baseResponse = require("../../../config/baseResponseStatus");
+const { response, errResponse } = require("../../../config/response");
 const boardDao = require("./boardDao");
+const boardProvider = require("./boardProvider");
 
 // 홈 화면 - 광고 배너
 exports.getAd = async function () {
@@ -66,9 +69,27 @@ exports.getProfileImg = async function (userIdx) {
 };
 
 // 10초 사진 - 상세
-exports.tensPhotoDetail = async function (id, userIdx) {
+exports.tensPhotoDetail = async function (id, user_id) {
   const connection = await pool.getConnection(async (conn) => conn);
-  const result = await boardDao.tensPhotoDetail(connection, id, userIdx);
+  const result = await boardDao.tensPhotoDetail(connection, id, user_id);
+  connection.release();
+  return result;
+};
+
+// 10초 사진 계정 확인
+exports.checkId = async function (id) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  const result = await boardDao.checkId(connection, id);
+  console.log(result);
+  connection.release();
+  return result;
+};
+
+// 10초 사진 public 확인(공개, 비공개)
+exports.public_TF = async function (id) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  const result = await boardDao.public_TF(connection, id);
+  console.log(result);
   connection.release();
   return result;
 };

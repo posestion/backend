@@ -142,11 +142,12 @@ async function createTensPhoto(
   expertTF,
   pose_image,
   date,
+  public,
   profile
 ) {
   const query = `
-  INSERT INTO 10s_photo(user_id,title,expertTF,pose_image,date,profile_image)
-  VALUES (?, ?, ?, ?, ?, ?);
+  INSERT INTO 10s_photo(user_id,title,expertTF,pose_image,date,profile_image,public)
+  VALUES (?, ?, ?, ?, ?, ?, ?);
   `;
   const [result] = await connection.query(query, [
     userIdx,
@@ -155,6 +156,7 @@ async function createTensPhoto(
     pose_image,
     date,
     profile,
+    public,
   ]);
   return result;
 }
@@ -166,12 +168,13 @@ async function tensPhotoDetail(connection, id, user_id) {
     SELECT a.*,DATE_FORMAT(a.date, '%Y-%m-%d') as date,b.nickname
     FROM 10s_photo a
     LEFT JOIN User b ON a.user_id=b.id
-    WHERE a.id=? and b.id=?
+    WHERE a.id=? 
     `,
-    [id, user_id]
+    id
   );
   return result;
 }
+
 // 10초 사진 - 게시판에 띄우기
 async function getAllTensPhoto(connection) {
   const [result] = await connection.query(
@@ -179,8 +182,35 @@ async function getAllTensPhoto(connection) {
     SELECT a.id,a.title,a.pose_image, DATE_FORMAT(a.date, '%Y-%m-%d') as date,b.nickname
     FROM 10s_photo a
     LEFT JOIN User b ON a.user_id=b.id
+    where a.public=1
     order by date desc; 
     `
+  );
+  return result;
+}
+
+// 10초 사진 계정 확인
+async function checkId(connection, id) {
+  const [result] = await connection.query(
+    `
+    SELECT user_id
+    FROM 10s_photo
+    WHERE id=?;
+    `,
+    id
+  );
+  return result;
+}
+
+// 10초 사진 public 확인(공개, 비공개)
+async function public_TF(connection, id) {
+  const [result] = await connection.query(
+    `
+    SELECT public
+    FROM 10s_photo
+    WHERE id=?;
+    `,
+    id
   );
   return result;
 }
@@ -196,4 +226,6 @@ module.exports = {
   tensPhotoDetail,
   getAllTensPhoto,
   getAd,
+  checkId,
+  public_TF,
 };
