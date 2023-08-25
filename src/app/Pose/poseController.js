@@ -130,7 +130,7 @@ exports.allView = async function (req, res) {
 };
 // 검색
 exports.poseSearch = async function (req, res) {
-  const { word } = await req.body;
+  const word = req.query.word;
   if (!word) {
     // 띄어쓰기만 한 것도 에러메시지에 포함?
     return res.send(baseResponse.SEARCH_NULL);
