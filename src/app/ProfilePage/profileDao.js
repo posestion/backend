@@ -77,14 +77,17 @@ async function getMyClass(connection,userIdx){
     board_class_dibs d ON (c.id = d.class_id AND d.user_id = ?)
     LEFT OUTER JOIN
     board_class_image i ON (c.id = i.class_id AND i.sequence = 0) 
-    where c.user_id = ?
+    where c.user_id = ? and c.public = true
     order by c.id desc`,
     [userIdx, userIdx]
   );
   return myClass[0];
 }
 
+
+
 async function getMyContent(connection,userIdx){
+  //내가 올린 이사잘
   const wdyt = await connection.query(
     `SELECT
     '이사잘' AS 'category',w.id, w.title, i.image_url AS 'image',  substring(w.content,1,15) AS 'content',
@@ -98,26 +101,50 @@ async function getMyContent(connection,userIdx){
      board_WhatDoYouThink_like l ON (w.id = l.board_WhatDoYouThink_id AND l.user_id = ?)
   LEFT OUTER JOIN
     board_WhatDoYouThink_images i ON (w.id = i.board_WhatDoYouThink_id AND i.sequence = 0)
-  WHERE w.user_id = ?
+  WHERE w.user_id = ? and w.public = true
+    order by date desc
+    limit 4;`,[userIdx,userIdx]
+  )
+  //내가 올린 10초 사진
+  const photo= await connection.query(
+    `SELECT p.id,p.title,p.expertTF,p.pose_image,p.date,p.profile_image
+    FROM 10s_photo p
+    where user_id = ? and public = true
+    order by id desc limit 4;`,[userIdx]
+  )
+
+  return {'wdyt':wdyt[0],'10s_photo':photo[0]};
+}
+//getMyContentWdyt
+async function getMyContentWdyt(connection,userIdx){
+  const wdyt = await connection.query(
+    `SELECT
+    '이사잘' AS 'category',w.id, w.title, i.image_url AS 'image',  substring(w.content,1,15) AS 'content',
+    CASE WHEN l.board_WhatDoYouThink_id IS NOT NULL THEN true ELSE false END AS 'like',
+    (SELECT count(*) FROM board_WhatDoYouThink_like l WHERE l.board_WhatDoYouThink_id = w.id) AS 'Number_of_like'
+  ,(SELECT count(*) FROM board_WhatDoYouThink_comment c WHERE c.board_WhatDoYouThink_id = w.id) 'Number_of_reply'
+  ,w.date
+  FROM
+     board_WhatDoYouThink w
+  LEFT OUTER JOIN
+     board_WhatDoYouThink_like l ON (w.id = l.board_WhatDoYouThink_id AND l.user_id = ?)
+  LEFT OUTER JOIN
+    board_WhatDoYouThink_images i ON (w.id = i.board_WhatDoYouThink_id AND i.sequence = 0)
+  WHERE w.user_id = ? and w.public = true
     order by date desc;`,[userIdx,userIdx]
   )
-  const pose = await connection.query(
-    `SELECT
-    '포즈 상점' AS 'category',p.id, p.title, p.pose_image AS 'image',substring(p.content,1,15) AS 'content', 
-    CASE WHEN l.pose_id IS NOT NULL THEN true ELSE false END AS 'like',
-    (SELECT count(*) FROM Pose_fav l WHERE l.pose_id = p.id) AS 'Number_of_like'
-    ,p.date
-  FROM
-     Pose_write p
-  LEFT OUTER JOIN
-     Pose_fav l ON (p.id = l.pose_id AND l.user_id = ?)
-  WHERE p.user_id = ?
-  order by id desc; `,[userIdx,userIdx]
+  return wdyt[0];
+}
+async function getMyContent10sPhoto(connection,userIdx){
+  //내가 올린 10초 사진
+  const photo= await connection.query(
+    `SELECT p.id,p.title,p.expertTF,p.pose_image,p.date,p.profile_image
+    FROM 10s_photo p
+    where user_id = ? and public = true
+    order by id desc;`,[userIdx]
   )
-  const result = wdyt[0].concat(pose[0]);
-  result.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  return result;
+  return photo[0];
 }
 //getUserClass
 async function getUserClass(connection,userIdx,profileIdx){
@@ -131,7 +158,7 @@ async function getUserClass(connection,userIdx,profileIdx){
     board_class_dibs d ON (c.id = d.class_id AND d.user_id = ?)
     LEFT OUTER JOIN
     board_class_image i ON (c.id = i.class_id AND i.sequence = 0) 
-    where c.user_id = ?
+    where c.user_id = ? and c.public = true
     order by c.id desc`,
     [userIdx, profileIdx]
   );
@@ -152,27 +179,101 @@ async function getUserContent(connection,userIdx,profileIdx){
      board_WhatDoYouThink_like l ON (w.id = l.board_WhatDoYouThink_id AND l.user_id = ?)
   LEFT OUTER JOIN
     board_WhatDoYouThink_images i ON (w.id = i.board_WhatDoYouThink_id AND i.sequence = 0)
-  WHERE w.user_id = ?
-    order by date desc;`,[userIdx,profileIdx]
+  WHERE w.user_id = ? and w.public = true
+    order by date desc limit 4;`,[userIdx,profileIdx]
   )
-  const pose = await connection.query(
-    `SELECT
-    '포즈 상점' AS 'category',p.id, p.title, p.pose_image AS 'image',substring(p.content,1,15) AS 'content', 
-    CASE WHEN l.pose_id IS NOT NULL THEN true ELSE false END AS 'like',
-    (SELECT count(*) FROM Pose_fav l WHERE l.pose_id = p.id) AS 'Number_of_like'
-    ,p.date
-  FROM
-     Pose_write p
-  LEFT OUTER JOIN
-     Pose_fav l ON (p.id = l.pose_id AND l.user_id = ?)
-  WHERE p.user_id = ?
-  order by id desc; `,[userIdx,profileIdx]
-  )
-  const result = wdyt[0].concat(pose[0]);
-  result.sort((a, b) => new Date(b.date) - new Date(a.date));
-  return result;
+    //내가 올린 10초 사진
+    const photo= await connection.query(
+      `SELECT p.id,p.title,p.expertTF,p.pose_image,p.date,p.profile_image
+      FROM 10s_photo p
+      where user_id = ? and public = true
+      order by id desc limit 4;`,[profileIdx]
+    )
+  
+  return {'wdyt':wdyt[0],'10s_photo':photo[0]};
 
 }
+//getUserContent_wdyt
+async function getUserContent_wdyt(connection,userIdx,profileIdx){
+  const wdyt = await connection.query(
+    `SELECT
+    '이사잘' AS 'category',w.id, w.title, i.image_url AS 'image',  substring(w.content,1,15) AS 'content',
+    CASE WHEN l.board_WhatDoYouThink_id IS NOT NULL THEN true ELSE false END AS 'like',
+    (SELECT count(*) FROM board_WhatDoYouThink_like l WHERE l.board_WhatDoYouThink_id = w.id) AS 'Number_of_like'
+  ,(SELECT count(*) FROM board_WhatDoYouThink_comment c WHERE c.board_WhatDoYouThink_id = w.id) 'Number_of_reply'
+  ,w.date
+  FROM
+     board_WhatDoYouThink w
+  LEFT OUTER JOIN
+     board_WhatDoYouThink_like l ON (w.id = l.board_WhatDoYouThink_id AND l.user_id = ?)
+  LEFT OUTER JOIN
+    board_WhatDoYouThink_images i ON (w.id = i.board_WhatDoYouThink_id AND i.sequence = 0)
+  WHERE w.user_id = ? and w.public = true
+    order by date desc;`,[userIdx,profileIdx]
+  )
+  return wdyt[0];
+}
+//getUserContent_10sPhoto
+async function getUserContent_10sPhoto(connection,userIdx,profileIdx){
+    //내가 올린 10초 사진
+    const photo= await connection.query(
+      `SELECT p.id,p.title,p.expertTF,p.pose_image,p.date,p.profile_image
+      FROM 10s_photo p
+      where user_id = ? and public = true
+      order by id desc;`,[profileIdx]
+    )
+  
+  return photo[0];
+
+}
+//getMyPage_wdyt
+async function getMyPage_wdyt(connection,userIdx){
+  const wdyt = await connection.query(
+    `SELECT
+    w.id, w.title, i.image_url AS 'image',  substring(w.content,1,15) AS 'content',
+    CASE WHEN l.board_WhatDoYouThink_id IS NOT NULL THEN true ELSE false END AS 'like',
+    (SELECT count(*) FROM board_WhatDoYouThink_like l WHERE l.board_WhatDoYouThink_id = w.id) AS 'Number_of_like'
+  ,(SELECT count(*) FROM board_WhatDoYouThink_comment c WHERE c.board_WhatDoYouThink_id = w.id) 'Number_of_reply'
+  ,w.date
+  FROM
+     board_WhatDoYouThink w
+  LEFT OUTER JOIN
+     board_WhatDoYouThink_like l ON (w.id = l.board_WhatDoYouThink_id AND l.user_id = ?)
+  LEFT OUTER JOIN
+    board_WhatDoYouThink_images i ON (w.id = i.board_WhatDoYouThink_id AND i.sequence = 0)
+  WHERE w.user_id = ? and w.public = false
+    order by date desc;`,[userIdx,userIdx]
+  )
+  return wdyt[0];
+}
+async function getMyPage_10sPhoto(connection,userIdx){
+  //내가 올린 10초 사진
+  const photo= await connection.query(
+    `SELECT p.id,p.title,p.expertTF,p.pose_image,p.date,p.profile_image
+    FROM 10s_photo p
+    where user_id = ? and public = false
+    order by id desc;`,[userIdx]
+  )
+  return photo[0];
+}
+async function getMyPage_class(connection,userIdx){
+  const UserClass = await connection.query(
+    `SELECT
+    c.id, c.title, i.image_url, c.hits,
+    CASE WHEN d.class_id IS NOT NULL THEN true ELSE false END AS 'dibs'
+    FROM
+    board_class c
+    LEFT OUTER JOIN
+    board_class_dibs d ON (c.id = d.class_id AND d.user_id = ?)
+    LEFT OUTER JOIN
+    board_class_image i ON (c.id = i.class_id AND i.sequence = 0) 
+    where c.user_id = ? and c.public = false
+    order by c.id desc`,
+    [userIdx, userIdx]
+  );
+  return UserClass[0];
+}
+
 
 //getUserProfile
 async function getUserProfile(connection,userIdx,profileIdx){
@@ -191,9 +292,10 @@ async function getUserProfile(connection,userIdx,profileIdx){
   from follow where user_id = ? and follower_id = ? ) AS 'follow'`
   ,[profileIdx,profileIdx,profileIdx,profileIdx ,profileIdx,profileIdx,profileIdx,profileIdx,profileIdx,profileIdx,userIdx]
   )
+  //올린 컨텐츠
   const wdyt = await connection.query(
     `SELECT
-    '이사잘' AS 'category',w.id, w.title, i.image_url AS 'image',  substring(w.content,1,15) AS 'content',
+    w.id, w.title, i.image_url AS 'image',  substring(w.content,1,15) AS 'content',
     CASE WHEN l.board_WhatDoYouThink_id IS NOT NULL THEN true ELSE false END AS 'like',
     (SELECT count(*) FROM board_WhatDoYouThink_like l WHERE l.board_WhatDoYouThink_id = w.id) AS 'Number_of_like'
   ,(SELECT count(*) FROM board_WhatDoYouThink_comment c WHERE c.board_WhatDoYouThink_id = w.id) 'Number_of_reply'
@@ -204,28 +306,10 @@ async function getUserProfile(connection,userIdx,profileIdx){
      board_WhatDoYouThink_like l ON (w.id = l.board_WhatDoYouThink_id AND l.user_id = ?)
   LEFT OUTER JOIN
     board_WhatDoYouThink_images i ON (w.id = i.board_WhatDoYouThink_id AND i.sequence = 0)
-  WHERE w.user_id = ?
+  WHERE w.user_id = ? and w.public = true
     order by date desc
     limit 3;`,[userIdx,profileIdx]
   )
-  const pose = await connection.query(
-    `SELECT
-    '포즈 상점' AS 'category',p.id, p.title, p.pose_image AS 'image',substring(p.content,1,15) AS 'content', 
-    CASE WHEN l.pose_id IS NOT NULL THEN true ELSE false END AS 'like',
-    (SELECT count(*) FROM Pose_fav l WHERE l.pose_id = p.id) AS 'Number_of_like'
-    ,p.date
-  FROM
-     Pose_write p
-  LEFT OUTER JOIN
-     Pose_fav l ON (p.id = l.pose_id AND l.user_id = ?)
-  WHERE p.user_id = ?
-  order by id desc
-  limit 3; `,[userIdx,profileIdx]
-  )
-  const sum1 = wdyt[0].concat(pose[0]);
-  sum1.sort((a, b) => new Date(b.date) - new Date(a.date));
-  const content = sum1.slice(0, 3);
-  console.log(info[0][0].expert);
   if (info[0][0].expert){
     const UserClass = await connection.query(
       `SELECT
@@ -237,15 +321,15 @@ async function getUserProfile(connection,userIdx,profileIdx){
       board_class_dibs d ON (c.id = d.class_id AND d.user_id = ?)
       LEFT OUTER JOIN
       board_class_image i ON (c.id = i.class_id AND i.sequence = 0) 
-      where c.user_id = ?
+      where c.user_id = ? and c.public = true
       order by c.id desc
       limit 3`,
       [userIdx, profileIdx]
     );
-    return [info[0][0],{'class':UserClass[0],'content':content}];
+    return [info[0][0],{'class':UserClass[0],'content':wdyt[0]}];
   }
   else{
-    return [info[0][0],{'content':content}];
+    return [info[0][0],{'content':wdyt[0]}];
   }
   
 
@@ -253,6 +337,7 @@ async function getUserProfile(connection,userIdx,profileIdx){
 
 //getUserProfile
 async function getMyPage(connection,userIdx){
+  //기본 정보
   const info = await connection.query(
     `SELECT
     (select expert from User where id = ? ) AS 'expert',
@@ -266,6 +351,7 @@ async function getMyPage(connection,userIdx){
       (select introduction from User where id = ? ) AS 'inroduction'`
   ,[userIdx,userIdx,userIdx,userIdx ,userIdx,userIdx,userIdx,userIdx,userIdx,userIdx]
   )
+  // 내가 올린 컨텐츠(내가 올린 이사잘)
   const wdyt = await connection.query(
     `SELECT
     '이사잘' AS 'category',w.id, w.title, i.image_url AS 'image',  substring(w.content,1,15) AS 'content',
@@ -281,8 +367,9 @@ async function getMyPage(connection,userIdx){
     board_WhatDoYouThink_images i ON (w.id = i.board_WhatDoYouThink_id AND i.sequence = 0)
   WHERE w.user_id = ?
     order by date desc
-    limit 3;`,[userIdx,userIdx]
+    limit 4;`,[userIdx,userIdx]
   )
+  //포즈서랍, 내가 올린 포즈
   const pose = await connection.query(
     `SELECT
     '포즈 상점' AS 'category',p.id, p.title, p.pose_image AS 'image',substring(p.content,1,15) AS 'content', 
@@ -295,45 +382,8 @@ async function getMyPage(connection,userIdx){
      Pose_fav l ON (p.id = l.pose_id AND l.user_id = ?)
   WHERE p.user_id = ?
   order by id desc
-  limit 3; `,[userIdx,userIdx]
+  limit 5; `,[userIdx,userIdx]
   )
-  const sum1 = wdyt[0].concat(pose[0]);
-  sum1.sort((a, b) => new Date(b.date) - new Date(a.date));
-  const content = sum1.slice(0, 3);
-  console.log(info[0][0].expert);
-
-  const drawer_wdyt = await connection.query(
-    `SELECT
-    w.id, w.title, i.image_url,w.date,
-    CASE WHEN l.board_WhatDoYouThink_id IS NOT NULL THEN true ELSE false END AS 'like',
-    (SELECT count(*) FROM board_WhatDoYouThink_like l WHERE l.board_WhatDoYouThink_id = w.id) AS 'Number_of_like'
-    ,(SELECT count(*) FROM board_WhatDoYouThink_comment c WHERE c.board_WhatDoYouThink_id = w.id) 'Number_of_reply'
-  FROM
-     board_WhatDoYouThink w
-  LEFT OUTER JOIN
-     board_WhatDoYouThink_like l ON (w.id = l.board_WhatDoYouThink_id AND l.user_id = ? )
-  LEFT OUTER JOIN
-    board_WhatDoYouThink_images i ON (w.id = i.board_WhatDoYouThink_id AND i.sequence = 0)
-  WHERE w.id in (select board_WhatDoYouThink_id from board_WhatDoYouThink_like where w.user_id = ? )
-    order by date desc limit 10 ;` ,[userIdx,userIdx]
-  );
-  const drawer_pose = await connection.query(
-    `SELECT
-    p.id, p.title, p.pose_image,p.date,
-    CASE WHEN l.pose_id IS NOT NULL THEN true ELSE false END AS 'like',
-    (SELECT count(*) FROM Pose_fav l WHERE l.pose_id = p.id) AS 'Number_of_like'
-  FROM
-     Pose_write p
-  LEFT OUTER JOIN
-     Pose_fav l ON (p.id = l.pose_id AND l.user_id = ? )
-  WHERE p.id in (select pose_id from Pose_fav where user_id = ? )
-  order by id desc
-  limit 10;` , [userIdx,userIdx]
-  )
-  const sum2 = drawer_wdyt[0].concat(drawer_pose[0]);
-  sum2.sort((a, b) => new Date(b.date) - new Date(a.date));
-  const drawer = sum2.slice(0, 10);
-  //return {"wdyt" : wdyt[0],"pose": pose[0]};
 
   if (info[0][0].expert){
     const UserClass = await connection.query(
@@ -346,19 +396,35 @@ async function getMyPage(connection,userIdx){
       board_class_dibs d ON (c.id = d.class_id AND d.user_id = ?)
       LEFT OUTER JOIN
       board_class_image i ON (c.id = i.class_id AND i.sequence = 0) 
-      where c.user_id = ?
+      where c.user_id = ? and c.public = true
       order by c.id desc
       limit 3`,
       [userIdx, userIdx]
     );
-    return [info[0][0],{'class':UserClass[0],'drawer':drawer,'content':content}];
+    return [info[0][0],{'class':UserClass[0],'poseDrawer':pose[0],'myContent':wdyt[0]}];
   }
   else{
-    return [info[0][0],{'drawer':drawer,'content':content}];
+    return [info[0][0],{'poseDrawer':pose[0],'myContent':wdyt[0]}];
   }
-  
 
 }
+//getPoseDrawer
+async function getPoseDrawer(connection,userIdx){
+
+  const poseDrawer = await connection.query(`SELECT
+  p.id, p.title, p.pose_image AS 'image',
+  CASE WHEN l.pose_id IS NOT NULL THEN true ELSE false END AS 'like',
+  (SELECT count(*) FROM Pose_fav l WHERE l.pose_id = p.id) AS 'Number_of_like'
+  ,p.date
+FROM
+   Pose_write p
+LEFT OUTER JOIN
+   Pose_fav l ON (p.id = l.pose_id AND l.user_id = ?)
+WHERE p.user_id = ? 
+order by id desc`,[userIdx,userIdx]);
+  return poseDrawer[0];
+}
+
 module.exports = {
   getMyPageDrawer,
   getLikeWdyt,
@@ -368,5 +434,13 @@ module.exports = {
   getUserClass,
   getUserContent,
   getUserProfile,
-  getMyPage
+  getMyPage,
+  getPoseDrawer,
+  getMyContentWdyt,
+  getMyContent10sPhoto,
+  getUserContent_wdyt,
+  getUserContent_10sPhoto,
+  getMyPage_class,
+  getMyPage_10sPhoto,
+  getMyPage_wdyt
 }

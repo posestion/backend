@@ -73,3 +73,27 @@ exports.getSearchPage = async function(useridx,content){
   connection.release();
   return result;
 }
+
+//getPublic
+exports.getPublic = async function(id){
+  const connection = await pool.getConnection(async (conn) => conn);
+  const result = await wdytDao.getPublic(connection,id);
+  connection.release();
+  return result;
+}
+
+//store
+exports.store = async function(id){
+  const connection = await pool.getConnection(async (conn) => conn);
+  const result = await wdytDao.store(connection,id);
+  connection.release();
+  return result;
+}
+
+//takeOut
+exports.takeOut = async function(id){
+  const connection = await pool.getConnection(async (conn) => conn);
+  const result = await wdytDao.takeOut(connection,id);
+  connection.release();
+  return result;
+}

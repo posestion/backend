@@ -70,6 +70,14 @@ exports.getClass  = async function (req, res){
     return res.send(baseResponse.CLASS_NOT_EXIST); //"해당 게시물이 없습니다."
   }
 
+  // public이 아닌경우 본인만 액세스 가능 -> public 여부 가져오기
+  const publicAndWriter=await classProvider.getPublic(id);
+  if(!publicAndWriter[0].public){
+    if(publicAndWriter[0].user_id != userIdx){
+      return res.send(baseResponse.privateContentError);
+    }
+  }
+
   const result = await classProvider.getClass(id,userIdx);
   return res.send(response(baseResponse.SUCCESS,result));
 }
@@ -87,6 +95,11 @@ exports.addRegister = async function(req,res){
   const userIdx = await userProvider.getIdx_by_user_id(req.verifiedToken.userId);
   if(!userIdx){
      return res.send(baseResponse.FIND_USER_ERROR); //"사용자 정보를 가져오는데 에러가 발생 하였습니다. 다시 시도해주세요."
+  }
+
+  const public = await classProvider.getPublic(id);
+  if(!public[0].public){
+    return res.send(baseResponse.privateContentError);
   }
 
  // 이미 수강 중인건지 확인
@@ -128,6 +141,11 @@ exports.addDibs = async function (req,res){
   const userIdx = await userProvider.getIdx_by_user_id(req.verifiedToken.userId);
   if(!userIdx){
     return res.send(baseResponse.FIND_USER_ERROR); //"사용자 정보를 가져오는데 에러가 발생 하였습니다. 다시 시도해주세요."
+  }
+
+  const public = await classProvider.getPublic(id);
+  if(!public[0].public){
+    return res.send(baseResponse.privateContentError);
   }
 
   // 이미 찜 한건지 확인
@@ -190,6 +208,11 @@ exports.postReview = async function (req,res){
   const isExist = await classProvider.getClassIsExist(class_id);
   if(isExist.length <= 0){
     return res.send(baseResponse.CLASS_NOT_EXIST);
+  }
+
+  const public = await classProvider.getPublic(id);
+  if(!public[0].public){
+    return res.send(baseResponse.privateContentError);
   }
 
   // 작성자는 리뷰 못쓰도록
@@ -342,6 +365,60 @@ exports.getSearchPage = async function(req,res){
   }
   const result = await classProvider.getSearchPage(userIdx,content);
   return res.send(response(baseResponse.SUCCESS,[{"count":result.length},result]));
+}
+
+exports.store = async function(req,res){
+  const id= req.params.id;
+  // 사용자 user_id 로 id 가져오기 -> 변수에 저장
+  const userIdx = await userProvider.getIdx_by_user_id(req.verifiedToken.userId);
+  if(!userIdx){
+    return res.send(baseResponse.FIND_USER_ERROR); //"사용자 정보를 가져오는데 에러가 발생 하였습니다. 다시 시도해주세요."
+  }
+  // 클래스가 있는지 확인
+  const isExist = await classProvider.getClassIsExist(id);
+  if(isExist.length <=0){
+     return res.send(baseResponse.CLASS_NOT_EXIST);
+  }
+  // 클래스 작성자와 지우려는 사람의 아이디가 같은지 확인.
+  const writer_id = await classProvider.getClassWriterByClassId(id); // class_id로 class 작성자 id 가져와서 비교
+  if(userIdx != writer_id[0].user_id){
+    return res.send(baseResponse.NotYourContent); 
+  }
+  //이미 보관 되어 있는 건지
+  // public이 아닌경우 본인만 액세스 가능 -> public 여부 가져오기
+  const publicAndWriter=await classProvider.getPublic(id);
+  if(!publicAndWriter[0].public){
+      return res.send(baseResponse.AlreadyStore);
+  }
+  await classProvider.store(id);
+  return res.send(baseResponse.SUCCESS);
+}
+
+exports.takeOut = async function(req,res){
+  const id= req.params.id;
+  // 사용자 user_id 로 id 가져오기 -> 변수에 저장
+  const userIdx = await userProvider.getIdx_by_user_id(req.verifiedToken.userId);
+  if(!userIdx){
+    return res.send(baseResponse.FIND_USER_ERROR); //"사용자 정보를 가져오는데 에러가 발생 하였습니다. 다시 시도해주세요."
+  }
+  // 클래스가 있는지 확인
+  const isExist = await classProvider.getClassIsExist(id);
+  if(isExist.length <=0){
+     return res.send(baseResponse.CLASS_NOT_EXIST);
+  }
+  // 클래스 작성자와 지우려는 사람의 아이디가 같은지 확인.
+  const writer_id = await classProvider.getClassWriterByClassId(id); // class_id로 class 작성자 id 가져와서 비교
+  if(userIdx != writer_id[0].user_id){
+    return res.send(baseResponse.NotYourContent); 
+  }
+  //이미 보관 되어 있는 건지
+  // public이 아닌경우 본인만 액세스 가능 -> public 여부 가져오기
+  const publicAndWriter= await classProvider.getPublic(id);
+  if(publicAndWriter[0].public == true){
+    return res.send(baseResponse.NotStore);
+  }
+  await classProvider.takeOut(id);
+  return res.send(baseResponse.SUCCESS);
 }
 
 

@@ -193,6 +193,7 @@ LEFT OUTER JOIN
   board_class_dibs d ON (c.id = d.class_id AND d.user_id = ? )
 LEFT OUTER JOIN
   board_class_image i ON (c.id = i.class_id AND i.sequence = 0)
+WHERE c.public = true
 ORDER BY hits desc;`,
     [user_id, user_id]
   );
@@ -213,7 +214,7 @@ LEFT OUTER JOIN
   board_class_dibs d ON (c.id = d.class_id AND d.user_id = ? )
 LEFT OUTER JOIN
 board_class_image i ON (c.id = i.class_id AND i.sequence = 0)
-WHERE c.id IN (SELECT DISTINCT class_id FROM board_class_tag t WHERE ${tagQuery});
+WHERE c.id IN (SELECT DISTINCT class_id FROM board_class_tag t WHERE ${tagQuery}) and c.public = true;
 `,
 [userIdx]
   );
@@ -231,7 +232,7 @@ LEFT OUTER JOIN
   board_class_dibs d ON (c.id = d.class_id AND d.user_id = ?)
 LEFT OUTER JOIN
   board_class_image i ON (c.id = i.class_id AND i.sequence = 0) 
-where d.user_id = ?
+where d.user_id = ? and c.public = true
 order by c.id desc
 LIMIT 4;`,
     [user_id, user_id]
@@ -249,7 +250,7 @@ LIMIT 4;`,
     board_class_dibs d ON (c.id = d.class_id AND d.user_id = ?)
     LEFT OUTER JOIN
     board_class_image i ON (c.id = i.class_id AND i.sequence = 0) 
-    where r.user_id = ?
+    where r.user_id = ? and c.public = true
     order by c.id desc
     LIMIT 4;`,
     [user_id, user_id ,user_id]
@@ -270,7 +271,7 @@ async function getMyClass(connection, user_id) {
     board_class_dibs d ON (c.id = d.class_id AND d.user_id = ?)
     LEFT OUTER JOIN
     board_class_image i ON (c.id = i.class_id AND i.sequence = 0) 
-    where r.user_id = ?
+    where r.user_id = ? ans c.public = true
     order by c.id desc`,
     [user_id, user_id,user_id]
   );
@@ -288,7 +289,7 @@ LEFT OUTER JOIN
   board_class_dibs d ON (c.id = d.class_id AND d.user_id = ?)
 LEFT OUTER JOIN
   board_class_image i ON (c.id = i.class_id AND i.sequence = 0) 
-where d.user_id = ?
+where d.user_id = ? and c.public = true
 order by c.id desc;`,
     [user_id, user_id]
   );
@@ -317,6 +318,23 @@ async function getAllClass(connection){
   return result[0];
 }
 
+async function getPublic(connection,id){
+  const result = await connection.query(`SELECT user_id,public FROM board_class where id=?`,id);
+  return result[0];
+}
+
+async function store(connection,id){
+  const result = await connection.query(`UPDATE board_class
+  SET public = false
+  WHERE id = ?;`,id);
+}
+
+//takeOut
+async function takeOut(connection,id){
+  const result = await connection.query(`UPDATE board_class
+  SET public = true
+  WHERE id = ?;`,id);
+}
 module.exports = {
   createClass,
   createImages,
@@ -343,5 +361,8 @@ module.exports = {
   getAllClass,
   getSearchPage,
   addRegister,
-  checkAlreadyRegister
+  checkAlreadyRegister,
+  getPublic,
+  store,
+  takeOut
 };

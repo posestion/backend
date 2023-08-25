@@ -150,3 +150,24 @@ exports.getSearchPage = async function(userIdx,content){
   connection.release();
   return result;
 }
+
+exports.getPublic = async function(id){
+  const connection = await pool.getConnection(async (conn) => conn);
+  const result = await classDao.getPublic(connection,id);
+  connection.release();
+  return result;
+}
+
+exports.store = async function(id){
+  const connection = await pool.getConnection(async (conn) => conn);
+  const result = await classDao.store(connection,id);
+  connection.release();
+  return result;
+}
+
+exports.takeOut = async function(id){
+  const connection = await pool.getConnection(async (conn) => conn);
+  const result = await classDao.takeOut(connection,id);
+  connection.release();
+  return result;
+} 

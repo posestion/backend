@@ -293,7 +293,27 @@ module.exports = {
     code: 404,
     message: "댓글을 삭제할 수 없습니다. 본인 댓글이 아닙니다.",
   },
-
+  //privateContentError
+  privateContentError:{
+    isSuccess: false,
+    code: 404,
+    message: "비공개 게시물입니다.",
+  },
+  NotYourContent:{
+    isSuccess: false,
+    code: 404,
+    message: "본인 게시물이 아닙니다.",
+  },
+  AlreadyStore:{
+    isSuccess: false,
+    code: 404,
+    message: "이미 보관한 게시물입니다.",
+  },
+  NotStore:{
+    isSuccess: false,
+    code: 404,
+    message: "보관하지 않았던 게시물입니다.",
+  },
   // 회원가입 자기소개 에러
   SIGNUP_INTRODUCTION_ERROR:{
     isSuccess: false,

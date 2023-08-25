@@ -140,6 +140,7 @@ async function getPage(connection,userIdx){
   board_WhatDoYouThink_like l ON (w.id = l.board_WhatDoYouThink_id AND l.user_id = ? )
   LEFT OUTER JOIN
   board_WhatDoYouThink_images i ON (w.id = i.board_WhatDoYouThink_id AND i.sequence = 0)
+  WHERE w.public = true
   order by w.date desc`,[userIdx]
   )
   return result[0];
@@ -182,7 +183,7 @@ async function getSearchPage(connection,userIdx,content){
   board_WhatDoYouThink_like l ON (w.id = l.board_WhatDoYouThink_id AND l.user_id = ? )
   LEFT OUTER JOIN
   board_WhatDoYouThink_images i ON (w.id = i.board_WhatDoYouThink_id AND i.sequence = 0)
-  WHERE w.content LIKE ? OR w.title LIKE ?
+  WHERE (w.content LIKE ? OR w.title LIKE ?) and w.public = true
   order by w.date desc`,
   [userIdx, `%${content}%`, `%${content}%`]
   )
@@ -202,7 +203,24 @@ async function deleteWdyt(connection,id){
     id
   );
 }
+//getPublic
+async function getPublic(connection,id){
+  const result = await connection.query(`SELECT user_id,public FROM board_WhatDoYouThink where id = ?`,id);
+  return result[0];
+}
 
+async function store(connection,id){
+  const result = await connection.query(`UPDATE board_WhatDoYouThink
+  SET public = false
+  WHERE id = ?;`,id);
+}
+
+//takeOut
+async function takeOut(connection,id){
+  const result = await connection.query(`UPDATE board_WhatDoYouThink
+  SET public = true
+  WHERE id = ?;`,id);
+}
 
 module.exports = {
   createWdyt,
@@ -223,5 +241,8 @@ module.exports = {
   getSearchPage,
   getWdytWriterIdx,
   getImagesUrlByWdytId,
-  deleteWdyt
+  deleteWdyt,
+  getPublic,
+  store,
+  takeOut
 };

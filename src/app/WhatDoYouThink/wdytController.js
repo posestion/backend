@@ -66,11 +66,18 @@ exports.addLike = async function (req, res){
     return res.send(baseResponse.FIND_USER_ERROR); //"사용자 정보를 가져오는데 에러가 발생 하였습니다. 다시 시도해주세요."
   }
 
+  const publicAndWriter=await wdytProvider.getPublic(id);
+  if(!publicAndWriter[0].public){
+      return res.send(baseResponse.privateContentError);
+  }
+
   // 이미 좋아요 한건지 확인
   const checkAlreadyLike= await wdytProvider.checkAlreadyLike(userIdx,id);
   if(checkAlreadyLike.length>0){
     return res.send(baseResponse.WDYT_LIKE_ERROR);//"이미 찜한 게시물 입니다."
   }
+
+  
 
   // 보류!!
   // // 작성자와 찜하려는 사람 같은지 확인 -> 같은면 찜 불가
@@ -130,6 +137,7 @@ exports.addComment = async  function (req,res){
     return res.send(baseResponse.FIND_USER_ERROR); //"사용자 정보를 가져오는데 에러가 발생 하였습니다. 다시 시도해주세요."
   }
 
+
   // 그냥 대댓글인 경우, commentParentId 댓글이 있는지 확인.
   if(commentParentId){
     const isCommentExist = await wdytProvider.getWdytCommentIsExists(commentParentId);
@@ -150,6 +158,7 @@ exports.addComment = async  function (req,res){
 
 exports.addCommentLike = async  function (req,res){
   const id=req.params.id; 
+
 
   // 댓글이 있는지 확인
   const isCommentExist = await wdytProvider.getWdytCommentIsExists(id);
@@ -214,6 +223,16 @@ exports.getDetailPage =  async function (req,res){
    if(!userIdx){
      return res.send(baseResponse.FIND_USER_ERROR); //"사용자 정보를 가져오는데 에러가 발생 하였습니다. 다시 시도해주세요."
    }
+
+  // public이 아닌경우 본인만 액세스 가능 -> public 여부 가져오기
+  const publicAndWriter=await wdytProvider.getPublic(id);
+  if(!publicAndWriter[0].public){
+    if(publicAndWriter[0].user_id != userIdx){
+      return res.send(baseResponse.privateContentError);
+    }
+  }
+
+
   const result = await wdytProvider.getDetailPage(userIdx,id);
   return res.send(response(baseResponse.SUCCESS,result));
 
@@ -226,6 +245,7 @@ exports.getPage = async function (req,res){
   if(!userIdx){
     return res.send(baseResponse.FIND_USER_ERROR); //"사용자 정보를 가져오는데 에러가 발생 하였습니다. 다시 시도해주세요."
   }
+
   const result = await wdytProvider.getPage(userIdx);
   return res.send(response(baseResponse.SUCCESS,result));
 
@@ -237,6 +257,11 @@ exports.deleteComment= async function(req,res){
   const userIdx = await userProvider.getIdx_by_user_id(req.verifiedToken.userId);
   if(!userIdx){
     return res.send(baseResponse.FIND_USER_ERROR); //"사용자 정보를 가져오는데 에러가 발생 하였습니다. 다시 시도해주세요."
+  }
+
+  const publicAndWriter=await wdytProvider.getPublic(id);
+  if(!publicAndWriter[0].public){
+     return res.send(baseResponse.privateContentError);
   }
 
   // 댓글이 있는지 확인
@@ -293,4 +318,63 @@ exports.deleteWdyt = async function(req,res){
   const images= await wdytProvider.getImagesUrlByWdytId(id);
   const result = await wdytService.deleteWdyt(id,images);
   return res.send(result);
+}
+
+//store
+exports.store = async function(req,res){
+  const id=req.params.id; 
+
+  // 게시글이 있는지 확인
+  const isExist = await wdytProvider.getWdytIsExist(id);
+  if(isExist.length <=0){
+    return res.send(baseResponse.WDYT_NOT_EXISTS);
+  }
+
+   // 사용자 user_id 로 id 가져오기 -> 변수에 저장
+   const userIdx = await userProvider.getIdx_by_user_id(req.verifiedToken.userId);
+   if(!userIdx){
+     return res.send(baseResponse.FIND_USER_ERROR); //"사용자 정보를 가져오는데 에러가 발생 하였습니다. 다시 시도해주세요."
+   }
+
+  // 본인 게시물인지
+  const writer_id = await wdytProvider.getWdytWriterIdx(id); // class_id로 class 작성자 id 가져와서 비교
+  if(userIdx != writer_id[0].user_id){
+    return res.send(baseResponse.NotYourContent); 
+  }
+  // public이 아닌경우 본인만 액세스 가능 -> public 여부 가져오기
+  const publicAndWriter=await wdytProvider.getPublic(id);
+  if(!publicAndWriter[0].public){
+    return res.send(baseResponse.AlreadyStore);
+  }
+  await wdytProvider.store(id);
+  return res.send(baseResponse.SUCCESS);
+}
+//takeOut
+exports.takeOut = async function(req,res){
+  const id=req.params.id; 
+
+  // 게시글이 있는지 확인
+  const isExist = await wdytProvider.getWdytIsExist(id);
+  if(isExist.length <=0){
+    return res.send(baseResponse.WDYT_NOT_EXISTS);
+  }
+
+   // 사용자 user_id 로 id 가져오기 -> 변수에 저장
+   const userIdx = await userProvider.getIdx_by_user_id(req.verifiedToken.userId);
+   if(!userIdx){
+     return res.send(baseResponse.FIND_USER_ERROR); //"사용자 정보를 가져오는데 에러가 발생 하였습니다. 다시 시도해주세요."
+   }
+
+  // 본인 게시물인지
+  const writer_id = await wdytProvider.getWdytWriterIdx(id); // class_id로 class 작성자 id 가져와서 비교
+  if(userIdx != writer_id[0].user_id){
+    return res.send(baseResponse.NotYourContent); 
+  }
+  // public이 아닌경우 본인만 액세스 가능 -> public 여부 가져오기
+  const publicAndWriter=await wdytProvider.getPublic(id);
+  if(publicAndWriter[0].public){
+    return res.send(baseResponse.NotStore);
+  }
+  await wdytProvider.takeOut(id);
+  return res.send(baseResponse.SUCCESS);
 }
