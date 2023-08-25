@@ -22,7 +22,7 @@ async function takingLecture(connection, user_id) {
     board_class_dibs d ON (c.id = d.class_id AND d.user_id = ?)
     LEFT OUTER JOIN
     board_class_image i ON (c.id = i.class_id AND i.sequence = 0) 
-    where r.user_id = ?
+    where r.user_id = ? and c.public = true
     order by c.id desc
     LIMIT 2;`,
     [user_id, user_id, user_id]
@@ -41,7 +41,8 @@ FROM
 LEFT OUTER JOIN
   board_class_dibs d ON (c.id = d.class_id AND d.user_id = ? )
 LEFT OUTER JOIN
-  board_class_image i ON (c.id = i.class_id AND i.sequence = 0)
+  board_class_image i ON (c.id = i.class_id AND i.sequence = 0)\
+where c.public = true
 ORDER BY hits desc
 LIMIT 6;`,
     [user_id, user_id]
@@ -62,6 +63,7 @@ async function getWellPhoto(connection, userIdx) {
   board_WhatDoYouThink_like l ON (w.id = l.board_WhatDoYouThink_id AND l.user_id = ? )
   LEFT OUTER JOIN
   board_WhatDoYouThink_images i ON (w.id = i.board_WhatDoYouThink_id AND i.sequence = 0)
+  where w.public = true
   order by w.date desc
   LIMIT 3`,
     [userIdx]
@@ -77,6 +79,7 @@ async function getClass(connection, user_id) {
     board_class c
     LEFT OUTER JOIN
     board_class_image i ON (c.id = i.class_id AND i.sequence = 0)
+    where c.public = true
     ORDER BY c.date DESC
     LIMIT 4;`,
     [user_id, user_id]
@@ -96,6 +99,7 @@ LEFT OUTER JOIN
   board_class_dibs d ON (c.id = d.class_id AND d.user_id = ? )
 LEFT OUTER JOIN
   board_class_image i ON (c.id = i.class_id AND i.sequence = 0)
+where c.public=true
 ORDER BY hits desc
 LIMIT 2;`,
     [user_id, user_id]
@@ -115,7 +119,7 @@ LEFT OUTER JOIN
   board_class_dibs d ON (c.id = d.class_id AND d.user_id = ?)
 LEFT OUTER JOIN
   board_class_image i ON (c.id = i.class_id AND i.sequence = 0) 
-where d.user_id = ?
+where d.user_id = ? and c.public = true
 order by c.id desc;`,
     [user_id, user_id]
   );
