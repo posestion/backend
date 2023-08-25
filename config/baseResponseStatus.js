@@ -250,45 +250,45 @@ module.exports = {
     message: "작성자만 클래스를 삭제 할 수 있습니다.",
   },
   // 노승아 - 이사잘
-  WDYT_NOT_EXISTS : {
+  WDYT_NOT_EXISTS: {
     isSuccess: false,
     code: 404,
     message: "게시글이 존재하지 않습니다.",
   },
-  WDYT_LIKE_ERROR:{
+  WDYT_LIKE_ERROR: {
     isSuccess: false,
     code: 404,
     message: "이미 좋아요 한 게시글입니다.",
   },
-  WDYT_CANCEL_LIKE_ERROR:{
+  WDYT_CANCEL_LIKE_ERROR: {
     isSuccess: false,
     code: 404,
     message: "좋아요를 누르지 않았던 게시글입니다.",
   },
-  WDYT_FIND_PARENTCOMMENT_ERROR:{
+  WDYT_FIND_PARENTCOMMENT_ERROR: {
     isSuccess: false,
     code: 404,
     message: "부모 댓글을 찾을 수 없습니다.",
   },
-  WDYT_COMMENT_NOT_EXIST:{
+  WDYT_COMMENT_NOT_EXIST: {
     isSuccess: false,
     code: 404,
     message: "댓글을 찾을 수 없습니다.",
   },
   //이미 좋아요를 누른 댓글입니다.
-  WDYT_COMMENT_LIKE_ERROR:{
+  WDYT_COMMENT_LIKE_ERROR: {
     isSuccess: false,
     code: 404,
     message: "이미 좋아요를 누른 댓글입니다.",
   },
-    //이미 좋아요를 누른 댓글입니다.
-  WDYT_COMMENT_CANCEL_LIKE_ERROR:{
+  //이미 좋아요를 누른 댓글입니다.
+  WDYT_COMMENT_CANCEL_LIKE_ERROR: {
     isSuccess: false,
     code: 404,
     message: "좋아요를 누르지 않았던 댓글입니다.",
   },
   //WDYT_COMMENT_DELETE_ERROR
-  WDYT_COMMENT_DELETE_ERROR:{
+  WDYT_COMMENT_DELETE_ERROR: {
     isSuccess: false,
     code: 404,
     message: "댓글을 삭제할 수 없습니다. 본인 댓글이 아닙니다.",
@@ -315,13 +315,13 @@ module.exports = {
     message: "보관하지 않았던 게시물입니다.",
   },
   // 회원가입 자기소개 에러
-  SIGNUP_INTRODUCTION_ERROR:{
+  SIGNUP_INTRODUCTION_ERROR: {
     isSuccess: false,
     code: 404,
     message: "자기 소개는 20글자 이하로 써주세요.",
   },
   // 닉네임 자기소개 에러
-  PROFILE_FIND_NICKNAME_ERROR:{
+  PROFILE_FIND_NICKNAME_ERROR: {
     isSuccess: false,
     code: 404,
     message: "해당 닉네임을 가진 사용자가 없습니다.",
@@ -336,7 +336,7 @@ module.exports = {
     code: 404,
     message: "작성자만 게시글을 삭제 할 수 있습니다.",
   },
-  
+
   // Response error
   SIGNUP_REDUNDANT_EMAIL: {
     isSuccess: false,
@@ -432,6 +432,12 @@ module.exports = {
     isSuccess: false,
     code: 400,
     message: "즐겨찾기에 일치하는 포즈가 없습니다",
+  },
+  // 비공개
+  PRIVATE: {
+    isSuccess: false,
+    code: 400,
+    message: "비공개 게시물입니다.",
   },
   //Connection, Transaction 등의 서버 오류
   DB_ERROR: { isSuccess: false, code: 500, message: "데이터 베이스 에러" },

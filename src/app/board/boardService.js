@@ -19,6 +19,7 @@ exports.createTensPhoto = async function (
   expertTF,
   pose_image,
   date,
+  public,
   profile
 ) {
   try {
@@ -30,6 +31,7 @@ exports.createTensPhoto = async function (
       expertTF,
       pose_image,
       date,
+      public,
       profile
     );
     connection.release();

@@ -95,7 +95,7 @@ exports.getDibs = async function (req, res) {
 
 // 10초 사진 업로드
 exports.createTensPhoto = async function (req, res) {
-  const { title } = await req.body;
+  const { title, public } = await req.body;
   if (!title) {
     return res.send(baseResponse.NO_TITLE);
   }
@@ -136,6 +136,7 @@ exports.createTensPhoto = async function (req, res) {
     expertTF,
     pose_image,
     date,
+    public,
     profile[0]["profile_image"]
   );
   return res.send(response(baseResponse.SUCCESS, result));
@@ -156,8 +157,22 @@ exports.tensPhotoDetail = async function (req, res) {
     return res.send(baseResponse.FIND_USER_ERROR); //"사용자 정보를 가져오는데 에러가 발생 하였습니다. 다시 시도해주세요."
   }
 
-  const result = await boardProvider.tensPhotoDetail(id, userIdx);
-  return res.send(response(baseResponse.SUCCESS, result));
+  // 접근하려는 10초 사진이 비공개(public=0)일 시 본인 아니면 접근 불가
+  const checkedId = await boardProvider.checkId(id);
+  console.log(checkedId[0]["user_id"]);
+
+  const publicTF = await boardProvider.public_TF(id);
+  console.log(publicTF[0]["public"]);
+
+  if (publicTF[0]["public"] == 0) {
+    if (checkedId[0]["user_id"] != userIdx) {
+      return res.send(baseResponse.PRIVATE);
+    } else {
+    }
+  } else {
+    const result = await boardProvider.tensPhotoDetail(id, userIdx);
+    return res.send(response(baseResponse.SUCCESS, result));
+  }
 };
 
 // 10초 상점 - 게시판에 띄우기

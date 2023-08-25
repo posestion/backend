@@ -129,7 +129,45 @@ exports.getPoseWriterByPoseId = async function (id) {
 exports.getAge = async function (user_id) {
   const connection = await pool.getConnection(async (conn) => conn);
   const birth = await poseDao.getBirthday(connection, user_id);
-  const result = await poseDao.ageGroupGet(connection, birth[0]["age"]);
-  connection.release();
-  return result;
+  console.log(birth[0]["age"]);
+  // 생일 입력 안했을 시 최신순으로 반환 됨
+  if (birth[0]["age"] == null) {
+    const zero_result = await poseDao.filterDate(connection);
+    return zero_result;
+  } else {
+    // 생일 입력 했을 시 연령대별로 반환 됨
+    const result = await poseDao.ageGroupGet(connection, birth[0]["age"]);
+    connection.release();
+    return result;
+  }
+};
+
+// 포즈 연령대별 - 최신 순
+exports.ageNewest = async function (id) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  const birth = await poseDao.getBirthday(connection, id);
+  console.log(birth[0]["age"]);
+  if (birth[0]["age"] == null) {
+    const zero_result = await poseDao.filterDate(connection);
+    return zero_result;
+  } else {
+    const result = await poseDao.ageNewest(connection, birth[0]["age"]);
+    connection.release();
+    return result;
+  }
+};
+
+// 포즈 연령대별 - 인기 순
+exports.agePopular = async function (id) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  const birth = await poseDao.getBirthday(connection, id);
+  console.log(birth[0]["age"]);
+  if (birth[0]["age"] == null) {
+    const zero_result = await poseDao.filterDate(connection);
+    return zero_result;
+  } else {
+    const result = await poseDao.agePopular(connection, birth[0]["age"]);
+    connection.release();
+    return result;
+  }
 };
