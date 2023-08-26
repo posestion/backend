@@ -132,6 +132,7 @@ exports.getAge = async function (user_id) {
   console.log(birth[0]["age"]);
   // 생일 입력 안했을 시 최신순으로 반환 됨
   if (birth[0]["age"] == null) {
+    connection.release();
     const zero_result = await poseDao.filterDate(connection);
     return zero_result;
   } else {
@@ -149,6 +150,7 @@ exports.ageNewest = async function (id) {
   console.log(birth[0]["age"]);
   if (birth[0]["age"] == null) {
     const zero_result = await poseDao.filterDate(connection);
+    connection.release();
     return zero_result;
   } else {
     const result = await poseDao.ageNewest(connection, birth[0]["age"]);
@@ -164,6 +166,7 @@ exports.agePopular = async function (id) {
   console.log(birth[0]["age"]);
   if (birth[0]["age"] == null) {
     const zero_result = await poseDao.filterDate(connection);
+    connection.release();
     return zero_result;
   } else {
     const result = await poseDao.agePopular(connection, birth[0]["age"]);
