@@ -132,8 +132,8 @@ exports.getAge = async function (user_id) {
   console.log(birth[0]["age"]);
   // 생일 입력 안했을 시 최신순으로 반환 됨
   if (birth[0]["age"] == null) {
-    connection.release();
     const zero_result = await poseDao.filterDate(connection);
+    connection.release();
     return zero_result;
   } else {
     // 생일 입력 했을 시 연령대별로 반환 됨
