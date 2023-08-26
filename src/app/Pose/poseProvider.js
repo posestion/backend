@@ -163,7 +163,7 @@ exports.agePopular = async function (id) {
   const birth = await poseDao.getBirthday(connection, id);
   console.log(birth[0]["age"]);
   if (birth[0]["age"] == null) {
-    const zero_result = await poseDao.filterDate(connection);
+    const zero_result = await poseDao.filpopular(connection);
     return zero_result;
   } else {
     const result = await poseDao.agePopular(connection, birth[0]["age"]);
