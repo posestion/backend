@@ -34,4 +34,5 @@ module.exports = function (app) {
   app.get("/board/getHotClass", jwtMiddleware, board.getHotClass);
   // 클래스 - 내가 찜한 강의
   app.get("/board/getDibs", jwtMiddleware, board.getDibs);
+
 };
