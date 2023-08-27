@@ -70,7 +70,14 @@ exports.searchWord = async function (word) {
   return result;
 };
 
-// 즐겨찾기 조회(좋아요 게시판)
+// 검색 - hot 게시판
+exports.searchHot = async function (word) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  const result = await poseDao.searchHot(connection, word);
+  connection.release();
+  return result;
+};
+//  즐겨찾기 조회(좋아요 게시판)
 exports.favView = async function (user_id) {
   const connection = await pool.getConnection(async (conn) => conn);
   const result = await poseDao.favoritesView(connection, user_id);

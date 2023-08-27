@@ -22,6 +22,8 @@ module.exports = function (app) {
   app.get("/pose/allView", jwtMiddleware, pose.allView);
   // 검색
   app.get("/pose/search", jwtMiddleware, pose.poseSearch);
+  // 검색 - hot게시판
+  app.get("/pose/hotSearch", jwtMiddleware, pose.poseHotSearch);
   // 장바구니 포즈 삭제
   app.get("/pose/posebasketDelete/:id", jwtMiddleware, pose.poseDelete);
   // 즐겨찾기 추가
