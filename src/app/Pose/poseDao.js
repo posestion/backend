@@ -324,8 +324,8 @@ async function filterDate(connection) {
     FROM Pose_write p
     LEFT JOIN Pose_tag b ON p.id = b.pose_id
     GROUP BY p.id
-    ORDER BY date DESC;
-  `);
+    ORDER BY p.id DESC;
+    `);
 
   return result.map((row) => ({
     ...row,
@@ -440,7 +440,7 @@ async function getPoseData(
   `;
 
   if (orderByDate) {
-    secondQuery += "ORDER BY a.date DESC;";
+    secondQuery += "ORDER BY a.id DESC;";
   } else if (orderByView) {
     secondQuery += "ORDER BY a.view desc;";
   }
