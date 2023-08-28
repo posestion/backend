@@ -256,6 +256,45 @@ async function viewHotboard(connection) {
   return n_results;
 }
 
+// 검색 - hot 게시판
+async function searchHot(connection, word) {
+  // pose_id와 좋아요 수를 함께 불러오기
+  const query = `
+    SELECT a.id AS pose_id, COUNT(pf.pose_id) AS frequency
+    FROM Pose_write a
+    LEFT JOIN Pose_tag b ON a.id = b.pose_id
+    LEFT JOIN Pose_fav pf ON a.id = pf.pose_id
+    WHERE b.tag_name LIKE ?
+    GROUP BY a.id
+  `;
+  const searchTerm = `%${word}%`;
+  const [poseid_result] = await connection.query(query, searchTerm);
+
+  const poseIds = poseid_result.map((result) => result.pose_id);
+
+  if (poseIds.length === 0) {
+    return [];
+  }
+
+  const Query = `
+    SELECT a.*, DATE_FORMAT(a.date, '%Y-%m-%d') AS date, JSON_ARRAYAGG(b.tag_name) AS tag_name, COALESCE(p.frequency, 0) AS fav_count
+    FROM Pose_write a
+    LEFT JOIN Pose_tag b ON a.id = b.pose_id
+    LEFT JOIN (
+      SELECT pose_id, COUNT(*) AS frequency
+      FROM Pose_fav
+      GROUP BY pose_id
+    ) p ON a.id = p.pose_id
+    WHERE a.id IN (${poseIds.join(",")})
+    GROUP BY a.id
+    order by fav_count desc;
+  `;
+
+  const [results] = await connection.query(Query);
+
+  return results;
+}
+
 // 필터(인기순) 조회
 async function filpopular(connection) {
   const [result] = await connection.query(`
@@ -285,8 +324,8 @@ async function filterDate(connection) {
     FROM Pose_write p
     LEFT JOIN Pose_tag b ON p.id = b.pose_id
     GROUP BY p.id
-    ORDER BY date DESC;
-  `);
+    ORDER BY p.id DESC;
+    `);
 
   return result.map((row) => ({
     ...row,
@@ -401,7 +440,7 @@ async function getPoseData(
   `;
 
   if (orderByDate) {
-    secondQuery += "ORDER BY a.date DESC;";
+    secondQuery += "ORDER BY a.id DESC;";
   } else if (orderByView) {
     secondQuery += "ORDER BY a.view desc;";
   }
@@ -458,4 +497,5 @@ module.exports = {
   ageGroupGet,
   ageNewest,
   agePopular,
+  searchHot,
 };

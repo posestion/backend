@@ -70,7 +70,14 @@ exports.searchWord = async function (word) {
   return result;
 };
 
-// 즐겨찾기 조회(좋아요 게시판)
+// 검색 - hot 게시판
+exports.searchHot = async function (word) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  const result = await poseDao.searchHot(connection, word);
+  connection.release();
+  return result;
+};
+//  즐겨찾기 조회(좋아요 게시판)
 exports.favView = async function (user_id) {
   const connection = await pool.getConnection(async (conn) => conn);
   const result = await poseDao.favoritesView(connection, user_id);
@@ -165,7 +172,7 @@ exports.agePopular = async function (id) {
   const birth = await poseDao.getBirthday(connection, id);
   console.log(birth[0]["age"]);
   if (birth[0]["age"] == null) {
-    const zero_result = await poseDao.filterDate(connection);
+    const zero_result = await poseDao.filpopular(connection);
     connection.release();
     return zero_result;
   } else {

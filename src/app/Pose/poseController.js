@@ -139,6 +139,15 @@ exports.poseSearch = async function (req, res) {
   return res.send(response(baseResponse.SUCCESS, result));
 };
 
+exports.poseHotSearch = async function (req, res) {
+  const hot = req.query.hot;
+  if (!hot) {
+    // 띄어쓰기만 한 것도 에러메시지에 포함?
+    return res.send(baseResponse.SEARCH_NULL);
+  }
+  const result = await poseProvider.searchHot(hot);
+  return res.send(response(baseResponse.SUCCESS, result));
+};
 // 포즈 삭제
 exports.poseDelete = async function (req, res) {
   const user_id = await userProvider.getIdx_by_user_id(
