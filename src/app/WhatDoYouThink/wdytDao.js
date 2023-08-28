@@ -244,5 +244,5 @@ module.exports = {
   deleteWdyt,
   getPublic,
   store,
-  takeOut
+  takeOut,
 };

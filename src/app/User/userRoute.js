@@ -2,7 +2,7 @@ const multer = require("multer");
 const upload = multer();
 const {
   imageUploader_profile,
-  imageUploader_board,
+  imageUploader_board,imageUploader_profile_change
 } = require("../../../config/imageUploader");
 module.exports = function (app) {
   const user = require("./userController");
@@ -58,10 +58,17 @@ module.exports = function (app) {
 
   app.get("/app/cancelFollow/:userId", jwtMiddleware, user.cancelfollow);
   // 회원 정보 수정
-  app.patch(
-    "/app/userchange",
-    jwtMiddleware,
-    imageUploader_profile.single("image"),
-    user.userchange
-  );
+  // app.patch(
+  //   "/app/userchange",
+  //   jwtMiddleware,
+  //   imageUploader_profile.single("image"),
+  //   user.userchange
+  // );
+
+  // 회원 정보 화면
+  app.get("/app/userInfo",jwtMiddleware,user.info);
+  
+  // 회원 정보 수정
+  app.patch("/app/userChange",jwtMiddleware,imageUploader_profile_change.single("image"),user.change);
+  
 };

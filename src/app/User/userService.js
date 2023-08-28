@@ -240,3 +240,18 @@ exports.changeuser = async function (
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+//change
+exports.change = async function (
+  userIdx,nickname,birth,phone_num,introduction,hashedPassword,imageURL
+) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+    await userDao.change(connection,userIdx,nickname,birth,phone_num,introduction,hashedPassword,imageURL);
+    connection.release();
+    return baseResponse.SUCCESS;
+  } catch (err) {
+    logger.error(`App - change Service error\n: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}

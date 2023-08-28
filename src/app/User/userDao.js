@@ -50,7 +50,7 @@ async function selectRepeatId(connection, id) {
 // 중복 닉네임 확인
 async function selectRepeatName(connection, name) {
   const selectUserRepeatName = `
-    SELECT nickname
+    SELECT nickname,id
     FROM User
     WHERE nickname=?;
     `;
@@ -316,6 +316,54 @@ WHERE id = ?;
   return queryResult;
 }
 
+async function info(connection , userIdx){
+  const info = await connection.query(
+    `SELECT nickname,DATE_FORMAT(birth, '%y-%m-%d') AS birth,phone_num,introduction,profile_image FROM User WHERE id = ?`,
+    userIdx
+  );
+  return info[0];
+}
+async function change(connection,userIdx,nickname,birth,phone_num,introduction,hashedPassword,imageURL){
+  const query=
+    `
+    UPDATE User
+    SET 
+    ${nickname ? "nickname = ?," : ""}
+    ${hashedPassword !== null ? "password = ?," : ""}
+    ${birth ? "birth = ?," : ""}
+    ${imageURL !== null ? "profile_image = ?," : ""}
+    ${introduction ? "introduction = ?," : ""}
+    ${phone_num ? "phone_num = ?" : ""}
+    WHERE id = ?
+  `;
+  const values = [];
+  
+  if (nickname) {
+    values.push(nickname);
+  }
+  
+  if (hashedPassword !== null) {
+    values.push(hashedPassword);
+  }
+  
+  if (birth) {
+    values.push(birth);
+  }
+  
+  if (imageURL !== null) {
+    values.push(imageURL);
+  }
+  
+  if (introduction) {
+    values.push(introduction);
+  }
+  if (phone_num) {
+    values.push(phone_num);
+  }
+  
+  values.push(userIdx);
+  await connection.query(query, values);
+}
 module.exports = {
   selectRepeatId,
   selectRepeatName,
@@ -336,4 +384,6 @@ module.exports = {
   getIsExpert,
   getIdx_by_nickname,
   infoChange,
+  info,
+  change
 };

@@ -86,6 +86,7 @@ exports.getIdx_by_user_id = async function (user_id) {
 
   //만약 해당하는 사용자가 없다면 -> 새로 추가한거!
   if (!id[0]) {
+    connection.release();
     return null;
   }
 
@@ -100,6 +101,7 @@ exports.getIdx_by_nickname = async function (nickname){
   
   //만약 해당하는 사용자가 없다면 -> 새로 추가한거!
   if(!id[0]){
+    connection.release();
     return null;
   }
 
@@ -129,3 +131,11 @@ exports.getIsExpert = async function (userIdx) {
   connection.release();
   return isExpert[0].expert;
 };
+
+// info
+exports.info = async function (userIdx){
+  const connection = await pool.getConnection(async (conn) => conn);
+  const result = await userDao.info(connection, userIdx);
+  connection.release();
+  return result;
+}
